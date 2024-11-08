@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Principale - Liste des Emprunts</title>
+    <link rel="stylesheet" href="/static/css/style.css"> <!-- Lien vers un fichier CSS -->
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <ul>
+            <li><a href="/abonnes">Abonnés</a></li>
+            <li><a href="/documents">Documents</a></li>
+            <li><a href="/emprunts">Emprunts</a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main>
+        <!-- Barre de recherche -->
+        <div class="search-bar">
+            <input type="text" placeholder="Rechercher un emprunt..." id="searchInput">
+            <button onclick="searchEmprunts()">Rechercher</button>
+        </div>
+
+        <!-- Liste des emprunts -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom Abonné</th>
+                    <th>Titre Document</th>
+                    <th>Date Emprunt</th>
+                    <th>Date Retour</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emprunt in emprunts %}
+                <tr>
+                    <td>{{ emprunt.nom_abonne }}</td>
+                    <td>{{ emprunt.titre_document }}</td>
+                    <td>{{ emprunt.date_emprunt }}</td>
+                    <td>{{ emprunt.date_retour }}</td>
+                    <td>{{ emprunt.statut }}</td>
+                    <td><button>Détails</button></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">Aucun emprunt trouvé.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+      
+        <a href="/add_emprunt" class="btn btn-primary mt-3">Ajouter un emprunt</a>
+    </main>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un Emprunt</title>
+    <!-- Ajouter le stylesheet Bootstrap pour la mise en forme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Ajouter un Emprunt</h1>
+
+    <!-- Formulaire pour ajouter un emprunt -->
+    <form action="/add_emprunt" method="POST">
+        <!-- Sélectionner un abonné -->
+        <div class="form-group">
+            <label for="abonne_id">Abonné :</label>
+            <select class="form-control" id="abonne_id" name="abonne_id" required>
+                {% for abonne in abonnes %}
+                    <option value="{{ abonne._id }}">{{ abonne.nom }} {{ abonne.prenom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Sélectionner un document -->
+        <div class="form-group">
+            <label for="document_id">Document :</label>
+            <select class="form-control" id="document_id" name="document_id" required>
+                {% for document in documents %}
+                    <option value="{{ document._id }}">{{ document.titre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Date de retour prévue -->
+        <div class="form-group">
+            <label for="date_retour_prevu">Date de retour prévue :</label>
+            <input type="date" class="form-control" id="date_retour_prevu" name="date_retour_prevu" required>
+            
+        </div>
+
+        <!-- Date d'emprunt -->
+        <div class="form-group">
+            <label for="date_emprunt">Date d'emprunt :</label>
+            
+            <input type="date" class="form-control" id="date_emprunt" name="date_emprunt" value="{{ datetime.now().strftime('%Y-%m-%d') }}" disabled>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+        <a href="/emprunts" class="btn btn-secondary">Retour à la liste des emprunts</a>
+    </form>
+</div>
+
+</body>
+</html>

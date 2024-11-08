@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # CREATE - Ajouter un emprunt
 def add_emprunt(data, mongo):
@@ -89,3 +89,29 @@ def delete_emprunt(id, mongo):
         )
         return {"message": "Emprunt supprimé avec succès!"}
     return {"message": "Aucune modification apportée"}, 400
+
+
+
+def add_emprunt_to_db(abonne_id, document_id, date_retour_prevu,mongo):
+    emprunt = {
+        "abonne_id": abonne_id,
+        "document_id": document_id,
+        "date_emprunt": datetime.now(),
+        "date_retour_prevu": date_retour_prevu,
+        "date_retour_effectif": None,  # Initialement vide
+        "statut": "emprunté"
+    }
+    # Insertion de l'emprunt dans la base de données
+    mongo.db.emprunts.insert_one(emprunt)
+
+    # Mettre à jour la disponibilité du document
+    mongo.db.documents.update_one(
+        {"_id": mongo.ObjectId(document_id)},
+        {"$set": {"disponibilite": False}}  # Le document n'est plus disponible
+    )
+
+    # Ajouter l'emprunt à l'historique de l'abonné
+    mongo.db.abonnes.update_one(
+        {"_id": mongo.ObjectId(abonne_id)},
+        {"$push": {"emprunts_en_cours": emprunt}}  # Ajouter l'emprunt à l'historique
+    )

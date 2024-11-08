@@ -4,7 +4,7 @@ from config import Config
 from models import abonne
 from models import document
 from models import emprunt
-
+from datetime import datetime
 
 
 app = Flask(__name__)  # Corrigé name en _name_
@@ -18,7 +18,7 @@ mongo = PyMongo(app)
 # Route principale
 @app.route('/')
 def home():
-    return "Bienvenue dans la médiathèque !"
+    return render_template('index.html')
 
 
 
@@ -203,31 +203,41 @@ def delete_document_route(id):
         return jsonify({"error": str(e)}), 500
 
 
-# Exemple d'utilisation dans une route
-@app.route('/add_emprunt', methods=['POST'])
-def add_emprunt_route():
-    data = request.get_json()  # Récupérer les données envoyées en JSON
-    return emprunt.add_emprunt(data, mongo)
 
-@app.route('/emprunts', methods=['GET'])
-def get_all_emprunts():
-    return jsonify(emprunt.get_emprunts(mongo))
 
-@app.route('/emprunts/<id>', methods=['GET'])
-def get_emprunt(id):
-    emprunt = emprunt.get_emprunt_by_id(id, mongo)
-    if emprunt:
-        return jsonify(emprunt)
-    return jsonify({"message": "Emprunt non trouvé"}), 404
 
-@app.route('/emprunts/<id>', methods=['PUT'])
-def update_emprunt_route(id):
-    data = request.get_json()
-    return emprunt.update_emprunt(id, data, mongo)
+@app.route('/add_emprunt', methods=['GET', 'POST'])
+def add_emprunt():
+    if request.method == 'POST':
+        # Récupérer les données du formulaire
+        abonne_id = request.form['abonne_id']
+        document_id = request.form['document_id']
+        date_retour_prevu = request.form['date_retour_prevu']
+        
+        # Ajoutez ici votre logique pour enregistrer l'emprunt dans MongoDB
+        emprunt.add_emprunt_to_db(abonne_id, document_id, date_retour_prevu)
 
-@app.route('/emprunts/<id>', methods=['DELETE'])
-def delete_emprunt_route(id):
-    return emprunt.delete_emprunt(id, mongo)
+        return redirect('/emprunts')  # Rediriger après ajout
+        
+    # Récupérer les abonnés et les documents depuis la base de données
+    abonnes = mongo.db.abonnes.find()  # Obtenez la liste des abonnés
+    documents = mongo.db.documents.find()  # Obtenez la liste des documents
+
+    # Renvoyer la page avec les données nécessaires
+    return render_template('emprunts/ajouter.html', abonnes=abonnes, documents=documents)
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':  # Corrigé name en _name_
     print("Démarrage de l'application Flask sur le port 5000")
     app.run(debug=True, port=5000)
