@@ -86,25 +86,54 @@ def delete_abonne_route(id):
     return jsonify(result)
 
 
-# Route pour ajouter un document
+
+# Afficher le formulaire d'ajout de document
+@app.route('/add_document', methods=['GET'])
+def show_add_document_form():
+    return render_template('documents/ajouter.html')
+
+# Ajouter un document via POST
 @app.route('/add_document', methods=['POST'])
 def add_document_route():
-    data = request.get_json()
+    # Récupérer les données du formulaire via request.form
+    titre = request.form['titre']
+    auteur = request.form['auteur']
+    genre = request.form['genre']
+    date_publication = request.form['date_publication']
+    disponibilite = request.form['disponibilite']
+    
+    # Préparer les données du document
+    data = {
+        'titre': titre,
+        'auteur': auteur,
+        'genre': genre,
+        'date_publication': date_publication,
+        'disponibilite': disponibilite
+    }
+    
+    # Ajouter le document à la base de données
     result = document.add_document(data, mongo)
-    return jsonify(result)
+    
+    # Rediriger vers la page de liste des documents après ajout
+    return redirect('/documents')
 
 @app.route('/documents', methods=['GET'])
 def documents_lister():
     documents = document.get_documents(mongo)  # Récupère tous les documents
     return render_template('documents/lister.html', documents=documents)
 
+
+
+
 # Route pour récupérer un document par ID
-@app.route('/documents/<id>', methods=['GET'])
-def get_document_by_id_route(id):
-    document = document.get_document_by_id(id, mongo)
-    if document:
-        return jsonify(document)
-    return jsonify({"message": "Document non trouvé"}), 404
+@app.route('/documents/<id>/', methods=['GET'])
+def show_document_details(id):
+    # Appeler la fonction du module 'document' pour récupérer un document
+    doc = document.get_document_by_id(id, mongo)  # Renommer la variable pour éviter le conflit
+    if doc:
+        return render_template('documents/details.html', document=doc)  # Afficher la page de détails
+    else:
+        return "Document non trouvé", 404  # Si le document n'est pas trouvé
 
 # Route pour mettre à jour un document
 '''@app.route('/documents/<id>', methods=['PUT'])
@@ -113,6 +142,12 @@ def update_document_route(id):
     result = document.update_document(id, data, mongo)
     return jsonify(result)'''
 
+# Route pour mettre à jour un document
+@app.route('/documents/<id>/update', methods=['POST'])
+def update_document(id):
+    data = request.form  # Récupérer les données envoyées via le formulaire
+    result = document.update_document(id, data, mongo)
+    return redirect('/documents')  # Rediriger vers la liste des documents après modification
 
 @app.route('/documents/<id>/', methods=['PUT'])
 def update_document_route(id):

@@ -31,14 +31,26 @@ def get_document_by_id(id, mongo):
     return None
 
 # UPDATE - Mettre à jour un document
-def update_document(id, data, mongo):
+'''def update_document(id, data, mongo):
     result = mongo.db.documents.update_one(
         {"_id": ObjectId(id)},  # Utilisation de ObjectId ici
         {"$set": data}  # Mise à jour des champs spécifiés
     )
     if result.modified_count > 0:
         return {"message": "Document mis à jour avec succès!"}
-    return {"message": "Aucune modification apportée"}, 400
+    return {"message": "Aucune modification apportée"}, 400'''
+
+# UPDATE - Modifier un document
+def update_document(id, data, mongo):
+    updated_document = {
+        "titre": data['titre'],
+        "auteur": data['auteur'],
+        "genre": data['genre'],
+        "date_publication": data['date_publication'],
+        "disponibilite": data['disponibilite']
+    }
+    mongo.db.documents.update_one({"_id": ObjectId(id)}, {"$set": updated_document})
+    return {"message": "Document mis à jour avec succès!"}
 
 # DELETE - Supprimer un document
 def delete_document(id, mongo):

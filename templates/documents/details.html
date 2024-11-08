@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du Document</title>
+    <!-- Inclure Bootstrap ou autres styles si nécessaire -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Détails du Document</h1>
+    <div class="card">
+        <div class="card-body">
+            <!-- Afficher les informations du document -->
+            <h5 class="card-title">{{ document.titre }}</h5>
+            <p><strong>Auteur :</strong> {{ document.auteur }}</p>
+            <p><strong>Genre :</strong> {{ document.genre }}</p>
+            <p><strong>Date de Publication :</strong> {{ document.date_publication }}</p>
+            <p><strong>Disponibilité :</strong> {{ document.disponibilite }}</p>
+        </div>
+    </div>
+
+    <!-- Retour à la liste des documents -->
+    <a href="/documents" class="btn btn-secondary mt-3">Retour à la Liste</a>
+</div>
+
+</body>
+</html>

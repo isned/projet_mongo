@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier le Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Modifier le Document</h1>
+
+    <!-- Formulaire pour modifier le document -->
+    <form action="/documents/{{ document['_id'] }}/update" method="POST">
+        <div class="form-group">
+            <label for="titre">Titre :</label>
+            <input type="text" class="form-control" id="titre" name="titre" value="{{ document.titre }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="auteur">Auteur :</label>
+            <input type="text" class="form-control" id="auteur" name="auteur" value="{{ document.auteur }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="genre">Genre :</label>
+            <input type="text" class="form-control" id="genre" name="genre" value="{{ document.genre }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="date_publication">Date de Publication :</label>
+            <input type="date" class="form-control" id="date_publication" name="date_publication" value="{{ document.date_publication }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="disponibilite">Disponibilité :</label>
+            <select class="form-control" id="disponibilite" name="disponibilite" required>
+                <option value="Disponible" {% if document.disponibilite == 'Disponible' %}selected{% endif %}>Disponible</option>
+                <option value="Indisponible" {% if document.disponibilite == 'Indisponible' %}selected{% endif %}>Indisponible</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
+        <a href="/documents" class="btn btn-secondary">Retour à la liste</a>
+    </form>
+</div>
+
+</body>
+</html>
