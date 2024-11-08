@@ -6,6 +6,9 @@ from models import document
 from models import emprunt
 from datetime import datetime
 
+from datetime import datetime
+from bson import ObjectId
+from flask import request, redirect, render_template, jsonify
 
 app = Flask(__name__)  # Corrigé name en _name_
 app.config.from_object(Config)
@@ -202,9 +205,51 @@ def delete_document_route(id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/emprunts', methods=['GET'])
+def emprunts_lister():
+    emprunts = emprunt.get_emprunts(mongo)  # Récupère tous les documents
+    return render_template('emprunts/lister.html', emprunts=emprunts)
 
+# Route pour récupérer un abonné par ID
+@app.route('/empruntss/<id>/', methods=['GET'])
+def show_emprunt_details(id):
+    em = emprunt.get_emprunt_by_id(id, mongo)
+    if em:
+        return render_template('emprunts/details.html', emprunt=em)
+    else:
+        return "Emprunt non trouvé", 404
 
+# Route pour afficher la page de modification
+@app.route('/emprunts/<id>/update', methods=['GET'])
+def show_update_emprunt_form(id):
+    emprunt_to_update = emprunt.get_emprunt_by_id(id, mongo)
+    if emprunt_to_update:
+        return render_template('emprunts/modifier.html', emprunt=emprunt_to_update)
+    else:
+        return "Emprunt non trouvé", 404
 
+# Route pour mettre à jour un abonné
+@app.route('/emprunts/<id>/update', methods=['POST'])
+def update_emprunt(id):
+    data = request.form
+    if not data:
+        return "Aucune donnée fournie", 400
+    result = emprunt.update_emprunt(id, data, mongo)
+    return redirect('/emprunts')
+
+# Route pour supprimer un abonné
+@app.route('/emprunts/<id>/delete', methods=['GET'])
+def delete_emprunt_route(id):
+    result = emprunt.delete_emprunt(id, mongo)
+    if 'message' in result:
+        return redirect('/emprunts')
+    else:
+        return "Erreur lors de la suppression", 404
+
+# Route pour ajouter un abonné
+@app.route('/add_emprunt', methods=['GET'])
+def show_add_emprunt_form():
+    return render_template('emprunts/ajouter.html')
 
 @app.route('/add_emprunt', methods=['GET', 'POST'])
 def add_emprunt():
@@ -237,19 +282,6 @@ def add_emprunt():
 
 
 
-@app.route('/emprunts/<id>/delete', methods=['GET'])
-def delete_emprunt_route(id):
-    try:
-        # Appel à la fonction delete_document dans document.py
-        result = emprunt.delete_emprunt(id, mongo)
-
-        # Vérifie si la suppression a réussi
-        if 'message' in result:
-            return redirect('/emprunts')  # Redirige vers la liste des documents après la suppression
-        else:
-            return "Erreur lors de la suppression du document", 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 
@@ -258,38 +290,8 @@ def delete_emprunt_route(id):
 
 
 
-# Route pour lister les abonnés
-@app.route('/emprunts', methods=['GET'])
-def emprunts_lister():
-    emprunts = emprunt.get_emprunts(mongo)  # Récupère tous les documents
-    return render_template('emprunts/lister.html', emprunts=emprunts)
 
-# Route pour récupérer un abonné par ID
-@app.route('/emprunts/<id>/', methods=['GET'])
-def show_emprunt_details(id):
-    em = emprunt.get_emprunt_by_id(id, mongo)
-    if em:
-        return render_template('emprunts/details.html', emprunt=em)
-    else:
-        return "Abonné non trouvé", 404
 
-# Route pour afficher la page de modification
-@app.route('/emprunts/<id>/update', methods=['GET'])
-def show_update_emprunt_form(id):
-    emprunt_to_update = emprunt.get_emprunt_by_id(id, mongo)
-    if emprunt_to_update:
-        return render_template('emprunts/modifier.html', emprunt=emprunt_to_update)
-    else:
-        return "Abonné non trouvé", 404
-
-# Route pour mettre à jour un abonné
-@app.route('/emprunts/<id>/update', methods=['POST'])
-def update_emprunt(id):
-    data = request.form
-    if not data:
-        return "Aucune donnée fournie", 400
-    result = emprunt.update_emprunt(id, data, mongo)
-    return redirect('/emprunts')
 
 
 if __name__ == '__main__':  # Corrigé name en _name_
