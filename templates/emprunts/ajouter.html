@@ -44,12 +44,12 @@
         <!-- Date d'emprunt -->
         <div class="form-group">
             <label for="date_emprunt">Date d'emprunt :</label>
+            <input type="date" class="form-control" id="date_emprunt" name="date_emprunt" value="{{ current_date }}" disabled>
             
-            <input type="date" class="form-control" id="date_emprunt" name="date_emprunt" value="{{ datetime.now().strftime('%Y-%m-%d') }}" disabled>
         </div>
 
         <button type="submit" class="btn btn-primary">Ajouter</button>
-        <a href="/emprunts" class="btn btn-secondary">Retour à la liste des emprunts</a>
+        <a href="/index.html" class="btn btn-secondary">Retour à la liste des emprunts</a>
     </form>
 </div>
 

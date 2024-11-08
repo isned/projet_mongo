@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from bson import ObjectId
 # CREATE - Ajouter un emprunt
 def add_emprunt(data, mongo):
     emprunt = {
@@ -7,7 +8,7 @@ def add_emprunt(data, mongo):
         "document_id": data['document_id'],
         "date_emprunt": datetime.now(),
         "date_retour_prevu": data['date_retour_prevu'],
-        "date_retour_effectif": None,  # Pour être défini lors du retour
+       
         "statut": "emprunté"
     }
     mongo.db.emprunts.insert_one(emprunt)
@@ -27,33 +28,33 @@ def add_emprunt(data, mongo):
     return {"message": "Emprunt enregistré avec succès!"}
 
 # READ - Récupérer tous les emprunts
-def get_emprunts(mongo):
+'''def get_emprunts(mongo):
     emprunts = mongo.db.emprunts.find()
     result = []
     for emprunt in emprunts:
         emprunt['_id'] = str(emprunt['_id'])  # Convertir ObjectId en string
         emprunt['retard'] = check_retard(emprunt)
         result.append(emprunt)
-    return result
+    return result'''
 
 # READ - Récupérer l'historique des emprunts pour un abonné
-def get_emprunts_by_abonne(abonne_id, mongo):
+'''def get_emprunts_by_abonne(abonne_id, mongo):
     emprunts = mongo.db.emprunts.find({"abonne_id": abonne_id})
     result = []
     for emprunt in emprunts:
         emprunt['_id'] = str(emprunt['_id'])
         emprunt['retard'] = check_retard(emprunt)
         result.append(emprunt)
-    return result
+    return result'''
 
 # Vérifier le retard d'un emprunt
-def check_retard(emprunt):
+'''def check_retard(emprunt):
     if emprunt['date_retour_effectif'] is None and datetime.now() > emprunt['date_retour_prevu']:
         return "En retard"
-    return "À jour" if emprunt['date_retour_effectif'] else "À rendre"
+    return "À jour" if emprunt['date_retour_effectif'] else "À rendre"'''
 
 # UPDATE - Enregistrer le retour d'un emprunt
-def enregistrer_retour(id, mongo):
+'''def enregistrer_retour(id, mongo):
     emprunt = mongo.db.emprunts.find_one({"_id": mongo.ObjectId(id)})
     if not emprunt:
         return {"message": "Emprunt non trouvé"}, 404
@@ -72,7 +73,7 @@ def enregistrer_retour(id, mongo):
 
     if result.modified_count > 0:
         return {"message": "Retour enregistré avec succès!"}
-    return {"message": "Aucune modification apportée"}, 400
+    return {"message": "Aucune modification apportée"}, 400'''
 
 # DELETE - Supprimer un emprunt
 def delete_emprunt(id, mongo):
@@ -92,13 +93,13 @@ def delete_emprunt(id, mongo):
 
 
 
-def add_emprunt_to_db(abonne_id, document_id, date_retour_prevu,mongo):
+def add_emprunt_to_db(abonne_id, document_id, date_retour_prevu, mongo):
     emprunt = {
         "abonne_id": abonne_id,
         "document_id": document_id,
         "date_emprunt": datetime.now(),
         "date_retour_prevu": date_retour_prevu,
-        "date_retour_effectif": None,  # Initialement vide
+      
         "statut": "emprunté"
     }
     # Insertion de l'emprunt dans la base de données
@@ -106,12 +107,12 @@ def add_emprunt_to_db(abonne_id, document_id, date_retour_prevu,mongo):
 
     # Mettre à jour la disponibilité du document
     mongo.db.documents.update_one(
-        {"_id": mongo.ObjectId(document_id)},
+        {"_id": ObjectId(document_id)},
         {"$set": {"disponibilite": False}}  # Le document n'est plus disponible
     )
 
     # Ajouter l'emprunt à l'historique de l'abonné
     mongo.db.abonnes.update_one(
-        {"_id": mongo.ObjectId(abonne_id)},
+        {"_id": ObjectId(abonne_id)},
         {"$push": {"emprunts_en_cours": emprunt}}  # Ajouter l'emprunt à l'historique
     )

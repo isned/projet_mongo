@@ -213,12 +213,20 @@ def add_emprunt():
         abonne_id = request.form['abonne_id']
         document_id = request.form['document_id']
         date_retour_prevu = request.form['date_retour_prevu']
-        
+        date_emprunt = datetime.now()
+
+        # Convertir la date de retour prévue en objet datetime
+        date_retour_prevu = datetime.strptime(date_retour_prevu, '%Y-%m-%d')
+
+        # Vérifier si la date de retour est antérieure à la date d'emprunt
+        if date_retour_prevu < date_emprunt:
+            return "La date de retour ne peut pas être antérieure à la date d'emprunt", 400
+
         # Ajoutez ici votre logique pour enregistrer l'emprunt dans MongoDB
-        emprunt.add_emprunt_to_db(abonne_id, document_id, date_retour_prevu)
+        emprunt.add_emprunt_to_db(abonne_id, document_id, date_retour_prevu,mongo)
 
         return redirect('/emprunts')  # Rediriger après ajout
-        
+
     # Récupérer les abonnés et les documents depuis la base de données
     abonnes = mongo.db.abonnes.find()  # Obtenez la liste des abonnés
     documents = mongo.db.documents.find()  # Obtenez la liste des documents
@@ -229,6 +237,19 @@ def add_emprunt():
 
 
 
+@app.route('/emprunts/<id>/delete', methods=['GET'])
+def delete_emprunt_route(id):
+    try:
+        # Appel à la fonction delete_document dans document.py
+        result = emprunt.delete_emprunt(id, mongo)
+
+        # Vérifie si la suppression a réussi
+        if 'message' in result:
+            return redirect('/emprunts')  # Redirige vers la liste des documents après la suppression
+        else:
+            return "Erreur lors de la suppression du document", 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 
@@ -236,6 +257,39 @@ def add_emprunt():
 
 
 
+
+# Route pour lister les abonnés
+@app.route('/emprunts', methods=['GET'])
+def emprunts_lister():
+    emprunts = emprunt.get_emprunts(mongo)  # Récupère tous les documents
+    return render_template('emprunts/lister.html', emprunts=emprunts)
+
+# Route pour récupérer un abonné par ID
+@app.route('/emprunts/<id>/', methods=['GET'])
+def show_emprunt_details(id):
+    em = emprunt.get_emprunt_by_id(id, mongo)
+    if em:
+        return render_template('emprunts/details.html', emprunt=em)
+    else:
+        return "Abonné non trouvé", 404
+
+# Route pour afficher la page de modification
+@app.route('/emprunts/<id>/update', methods=['GET'])
+def show_update_emprunt_form(id):
+    emprunt_to_update = emprunt.get_emprunt_by_id(id, mongo)
+    if emprunt_to_update:
+        return render_template('emprunts/modifier.html', emprunt=emprunt_to_update)
+    else:
+        return "Abonné non trouvé", 404
+
+# Route pour mettre à jour un abonné
+@app.route('/emprunts/<id>/update', methods=['POST'])
+def update_emprunt(id):
+    data = request.form
+    if not data:
+        return "Aucune donnée fournie", 400
+    result = emprunt.update_emprunt(id, data, mongo)
+    return redirect('/emprunts')
 
 
 if __name__ == '__main__':  # Corrigé name en _name_
