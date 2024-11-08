@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, redirect, render_template, request, jsonify
 from flask_pymongo import PyMongo
 from config import Config
 from models import abonne
@@ -23,12 +23,22 @@ def home():
 
 
 
-@app.route('/add_abonne', methods=['POST'])
+'''@app.route('/add_abonne', methods=['POST'])
 def ajouter_abonne():
     data = request.get_json()  # Récupérer les données envoyées par le client
     result = abonne.add_abonne(data,mongo)
     return jsonify(result)
+'''
 
+@app.route('/add_abonne', methods=['GET', 'POST'])
+def ajouter_abonne():
+    if request.method == 'POST':
+        data = request.form.to_dict()  # Récupérer les données du formulaire
+        result = abonne.add_abonne(data, mongo)
+        return jsonify(result)
+    else:
+        # Rendre le template HTML pour la méthode GET
+        return render_template('abonnes/ajouter.html')
 
 # READ - Récupérer tous les abonnés
 @app.route('/abonnes', methods=['GET'])
@@ -45,10 +55,28 @@ def get_abonne(id):
     return jsonify({"message": "Abonné non trouvé"}), 404
 
 # UPDATE - Mettre à jour un abonné
-@app.route('/abonnes/<string:id>', methods=['PUT'])
+'''@app.route('/abonnes/<string:id>', methods=['PUT'])
 def update_abonne_route(id):
     data = request.get_json()  # Données pour mettre à jour
     result = abonne.update_abonne(id, data,mongo)
+    return jsonify(result)
+'''
+
+@app.route('/abonnes/<string:id>', methods=['GET', 'PUT'])
+def update_abonne_route(id):
+    # Vérifier si la méthode est GET ou PUT
+    if request.method == 'GET':
+        # Récupérer les informations actuelles de l'abonné
+        abonne = abonne.get_abonne_by_id(id, mongo)
+        if not abonne:
+            return jsonify({"error": "Abonné non trouvé"}), 404
+        
+        # Afficher le template de mise à jour avec les informations de l'abonné
+        return render_template('abonnes/modifier.html', abonne=abonne)
+    
+    # Méthode PUT - pour mettre à jour l'abonné
+    data = request.get_json()  # Récupérer les données envoyées pour la mise à jour
+    result = abonne.update_abonne(id, data, mongo)
     return jsonify(result)
 
 # DELETE - Supprimer un abonné
@@ -65,11 +93,10 @@ def add_document_route():
     result = document.add_document(data, mongo)
     return jsonify(result)
 
-# Route pour récupérer tous les documents
 @app.route('/documents', methods=['GET'])
-def get_documents_route():
-    documents = document.get_documents(mongo)
-    return jsonify(documents)
+def documents_lister():
+    documents = document.get_documents(mongo)  # Récupère tous les documents
+    return render_template('documents/lister.html', documents=documents)
 
 # Route pour récupérer un document par ID
 @app.route('/documents/<id>', methods=['GET'])
@@ -80,17 +107,30 @@ def get_document_by_id_route(id):
     return jsonify({"message": "Document non trouvé"}), 404
 
 # Route pour mettre à jour un document
-@app.route('/documents/<id>', methods=['PUT'])
+'''@app.route('/documents/<id>', methods=['PUT'])
 def update_document_route(id):
     data = request.get_json()
     result = document.update_document(id, data, mongo)
-    return jsonify(result)
+    return jsonify(result)'''
+
+
+@app.route('/documents/<id>/', methods=['PUT'])
+def update_document_route(id):
+    data = document.get_document_by_id(id, mongo)
+    if data:
+        return render_template('documents/update.html', document=data)
+    return jsonify({"message": "Document non trouvé"}), 404
 
 # Route pour supprimer un document
-@app.route('/documents/<id>', methods=['DELETE'])
+'''@app.route('/documents/<id>', methods=['DELETE'])
 def delete_document_route(id):
     result = document.delete_document(id, mongo)
-    return jsonify(result)
+    return jsonify(result)'''
+
+@app.route('/documents/<id>', methods=['GET'])
+def delete_document_route(id):
+    result = document.delete_document(id, mongo)
+    return redirect('/documents')  # Rediriger vers la liste des documents après suppression
 
 
 
