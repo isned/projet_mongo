@@ -22,118 +22,70 @@ def home():
 
 
 
+
+
+# Route pour lister les abonnés
 @app.route('/abonnes', methods=['GET'])
 def abonnes_lister():
     abonnes = abonne.get_abonnes(mongo)  # Récupère tous les documents
-    return render_template('abonnes/lister.html',abonnes=abonnes)
+    return render_template('abonnes/lister.html', abonnes=abonnes)
 
-
-
-
-# Route pour récupérer un document par ID
+# Route pour récupérer un abonné par ID
 @app.route('/abonnes/<id>/', methods=['GET'])
 def show_abonne_details(id):
-    # Appeler la fonction du module 'document' pour récupérer un document
-    ab = abonne.get_abonne_by_id(id, mongo)  # Renommer la variable pour éviter le conflit
+    ab = abonne.get_abonne_by_id(id, mongo)
     if ab:
-        return render_template('abonnes/details.html', abonne=ab)  # Afficher la page de détails
+        return render_template('abonnes/details.html', abonne=ab)
     else:
-        return "Abonné non trouvé", 404  # Si le document n'est pas trouvé
+        return "Abonné non trouvé", 404
 
 # Route pour afficher la page de modification
 @app.route('/abonnes/<id>/update', methods=['GET'])
-def show_updateAbonne_form(id):
-    # Récupérer le document à partir de la base de données
-    abonne_to_update = abonne.get_abonne_by_id(id,mongo)
+def show_update_abonne_form(id):
+    abonne_to_update = abonne.get_abonne_by_id(id, mongo)
     if abonne_to_update:
         return render_template('abonnes/modifier.html', abonne=abonne_to_update)
     else:
-        return "ABonné non trouvé", 404
+        return "Abonné non trouvé", 404
 
-# Route pour mettre à jour le document
+# Route pour mettre à jour un abonné
 @app.route('/abonnes/<id>/update', methods=['POST'])
 def update_abonne(id):
-    data = request.form  # Récupérer les données envoyées via le formulaire
-
-    # Vérification si les données sont présentes
+    data = request.form
     if not data:
         return "Aucune donnée fournie", 400
-
-    # Mettre à jour le document avec les nouvelles données
     result = abonne.update_abonne(id, data, mongo)
+    return redirect('/abonnes')
 
-    return redirect('/abonnes')  # Rediriger vers la liste des documents après modification
-
-
-@app.route('/abonnes/<id>/', methods=['PUT'])
-def update_abonne_route(id):
-    data = abonne.get_abonne_by_id(id, mongo)
-    if data:
-        return render_template('abonnes/update.html', document=data)
-    return jsonify({"message": "Abonné non trouvé"}), 404
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Route pour supprimer un abonné
 @app.route('/abonnes/<id>/delete', methods=['GET'])
-def delete_abonnes_route(id):
-    try:
-        # Appel à la fonction delete_document dans document.py
-        result = abonne.delete_abonne(id, mongo)
+def delete_abonne_route(id):
+    result = abonne.delete_abonne(id, mongo)
+    if 'message' in result:
+        return redirect('/abonnes')
+    else:
+        return "Erreur lors de la suppression", 404
 
-        # Vérifie si la suppression a réussi
-        if 'message' in result:
-            return redirect('/abonnes')  # Redirige vers la liste des documents après la suppression
-        else:
-            return "Erreur lors de la suppression du document", 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-
-
-
-
-
-# Afficher le formulaire d'ajout de abonne
+# Route pour ajouter un abonné
 @app.route('/add_abonne', methods=['GET'])
 def show_add_abonne_form():
     return render_template('abonnes/ajouter.html')
 
-# Ajouter un document via POST
 @app.route('/add_abonne', methods=['POST'])
 def add_abonne_route():
-    # Récupérer les données du formulaire via request.form
-    nom= request.form['nom']
+    nom = request.form['nom']
     prenom = request.form['prenom']
     adresse = request.form['adresse']
+    date_inscription = request.form['date_inscription']
     
-    
-    # Préparer les données du document
     data = {
         'nom': nom,
         'prenom': prenom,
         'adresse': adresse,
-       
+        'date_inscription': date_inscription,
     }
     
-    # Ajouter le document à la base de données
     result = abonne.add_abonne(data, mongo)
-    
-    # Rediriger vers la page de liste des abonnesaprès ajout
     return redirect('/abonnes')
 
 

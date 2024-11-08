@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,9 +9,8 @@
 <body>
 
 <div class="container mt-4">
-    <h1>Modifier le Abonné</h1>
+    <h1>Modifier l'Abonné</h1>
 
-    <!-- Formulaire pour modifier le document -->
     <form action="/abonnes/{{ abonne['_id'] }}/update" method="POST">
         <div class="form-group">
             <label for="nom">Nom :</label>
@@ -22,21 +18,19 @@
         </div>
 
         <div class="form-group">
-            <label for="prenom">Prenom :</label>
+            <label for="prenom">Prénom :</label>
             <input type="text" class="form-control" id="prenom" name="prenom" value="{{ abonne['prenom'] }}" required>
         </div>
 
         <div class="form-group">
-            <label for="adresse">Adrsse :</label>
+            <label for="adresse">Adresse :</label>
             <input type="text" class="form-control" id="adresse" name="adresse" value="{{ abonne['adresse'] }}" required>
         </div>
 
         <div class="form-group">
-            <label for="date_publication">Date de inscription :</label>
-            <input type="date" class="form-control" id="date_inscription"  name="date_inscription" value="{{ abonne['date_inscription'] }}" required>
+            <label for="date_inscription">Date d'inscription :</label>
+            <input type="date" class="form-control" id="date_inscription" name="date_inscription" value="{{ abonne['date_inscription'] }}" required>
         </div>
-
-        
 
         <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
         <a href="/abonnes" class="btn btn-secondary">Retour à la liste</a>

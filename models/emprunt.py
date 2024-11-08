@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # CREATE - Ajouter un emprunt
 def add_emprunt(data, mongo):
@@ -7,6 +7,7 @@ def add_emprunt(data, mongo):
         "document_id": data['document_id'],
         "date_emprunt": datetime.now(),
         "date_retour_prevu": data['date_retour_prevu'],
+        "date_retour_effectif": None,  # Pour être défini lors du retour
         "statut": "emprunté"
     }
     mongo.db.emprunts.insert_one(emprunt)
@@ -31,35 +32,60 @@ def get_emprunts(mongo):
     result = []
     for emprunt in emprunts:
         emprunt['_id'] = str(emprunt['_id'])  # Convertir ObjectId en string
+        emprunt['retard'] = check_retard(emprunt)
         result.append(emprunt)
     return result
 
-# READ - Récupérer un emprunt par son ID
-def get_emprunt_by_id(id, mongo):
-    emprunt = mongo.db.emprunts.find_one({"_id": mongo.ObjectId(id)})
-    if emprunt:
-        emprunt['_id'] = str(emprunt['_id'])  # Convertir ObjectId en string
-        return emprunt
-    return None  # Retourne None si l'emprunt n'existe pas
+# READ - Récupérer l'historique des emprunts pour un abonné
+def get_emprunts_by_abonne(abonne_id, mongo):
+    emprunts = mongo.db.emprunts.find({"abonne_id": abonne_id})
+    result = []
+    for emprunt in emprunts:
+        emprunt['_id'] = str(emprunt['_id'])
+        emprunt['retard'] = check_retard(emprunt)
+        result.append(emprunt)
+    return result
 
-# UPDATE - Mettre à jour un emprunt
-def update_emprunt(id, data, mongo):
+# Vérifier le retard d'un emprunt
+def check_retard(emprunt):
+    if emprunt['date_retour_effectif'] is None and datetime.now() > emprunt['date_retour_prevu']:
+        return "En retard"
+    return "À jour" if emprunt['date_retour_effectif'] else "À rendre"
+
+# UPDATE - Enregistrer le retour d'un emprunt
+def enregistrer_retour(id, mongo):
+    emprunt = mongo.db.emprunts.find_one({"_id": mongo.ObjectId(id)})
+    if not emprunt:
+        return {"message": "Emprunt non trouvé"}, 404
+
+    # Mettre à jour la date de retour et le statut
     result = mongo.db.emprunts.update_one(
         {"_id": mongo.ObjectId(id)},
-        {"$set": data}  # Mise à jour des champs spécifiés
+        {"$set": {"date_retour_effectif": datetime.now(), "statut": "retourné"}}
     )
+
+    # Remettre la disponibilité du document à True
+    mongo.db.documents.update_one(
+        {"_id": emprunt['document_id']},
+        {"$set": {"disponibilite": True}}
+    )
+
     if result.modified_count > 0:
-        return {"message": "Emprunt mis à jour avec succès!"}
+        return {"message": "Retour enregistré avec succès!"}
     return {"message": "Aucune modification apportée"}, 400
 
 # DELETE - Supprimer un emprunt
 def delete_emprunt(id, mongo):
+    emprunt = mongo.db.emprunts.find_one({"_id": mongo.ObjectId(id)})
+    if not emprunt:
+        return {"message": "Emprunt non trouvé"}, 404
+
     result = mongo.db.emprunts.delete_one({"_id": mongo.ObjectId(id)})
     if result.deleted_count > 0:
         # Remettre la disponibilité du document à True
         mongo.db.documents.update_one(
-            {"_id": mongo.ObjectId(id)}, 
+            {"_id": emprunt['document_id']},
             {"$set": {"disponibilite": True}}
         )
         return {"message": "Emprunt supprimé avec succès!"}
-    return {"message": "Emprunt non trouvé"}, 404
+    return {"message": "Aucune modification apportée"}, 400
