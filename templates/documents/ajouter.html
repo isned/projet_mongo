@@ -1,26 +1,50 @@
-<form action="/add_document" method="POST">
-    <div class="form-group">
-        <label for="titre">Titre</label>
-        <input type="text" class="form-control" id="titre" name="titre" required>
-    </div>
-    <div class="form-group">
-        <label for="auteur">Auteur</label>
-        <input type="text" class="form-control" id="auteur" name="auteur" required>
-    </div>
-    <div class="form-group">
-        <label for="genre">Genre</label>
-        <input type="text" class="form-control" id="genre" name="genre" required>
-    </div>
-    <div class="form-group">
-        <label for="date_publication">Date de Publication</label>
-        <input type="date" class="form-control" id="date_publication" name="date_publication" required>
-    </div>
-    <div class="form-group">
-        <label for="disponibilite">Disponibilité</label>
-        <select class="form-control" id="disponibilite" name="disponibilite" required>
-            <option value="Disponible">True</option>
-            <option value="Indisponible">False</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Ajouter</button>
-</form>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un Document</title>
+    <!-- Ajouter le stylesheet Bootstrap pour la mise en forme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Ajouter un Document</h1>
+
+    <!-- Formulaire pour ajouter un document -->
+    <form action="/add_document" method="POST">
+        <div class="form-group">
+            <label for="titre">Titre :</label>
+            <input type="text" class="form-control" id="titre" name="titre" required>
+        </div>
+
+        <div class="form-group">
+            <label for="auteur">Auteur :</label>
+            <input type="text" class="form-control" id="auteur" name="auteur" required>
+        </div>
+
+        <div class="form-group">
+            <label for="genre">Genre :</label>
+            <input type="text" class="form-control" id="genre" name="genre" required>
+        </div>
+
+        <div class="form-group">
+            <label for="date_publication">Date de Publication :</label>
+            <input type="date" class="form-control" id="date_publication" name="date_publication" required>
+        </div>
+
+        <div class="form-group">
+            <label for="disponibilite">Disponibilité :</label>
+            <select class="form-control" id="disponibilite" name="disponibilite" required>
+                <option value="Disponible">Disponible</option>
+                <option value="Indisponible">Indisponible</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+    </form>
+</div>
+
+</body>
+</html>
