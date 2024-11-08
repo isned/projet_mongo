@@ -135,19 +135,30 @@ def show_document_details(id):
     else:
         return "Document non trouvé", 404  # Si le document n'est pas trouvé
 
-# Route pour mettre à jour un document
-'''@app.route('/documents/<id>', methods=['PUT'])
-def update_document_route(id):
-    data = request.get_json()
-    result = document.update_document(id, data, mongo)
-    return jsonify(result)'''
+# Route pour afficher la page de modification
+@app.route('/documents/<id>/update', methods=['GET'])
+def show_update_form(id):
+    # Récupérer le document à partir de la base de données
+    document_to_update = document.get_document_by_id(id,mongo)
+    if document_to_update:
+        return render_template('documents/modifier.html', document=document_to_update)
+    else:
+        return "Document non trouvé", 404
 
-# Route pour mettre à jour un document
+# Route pour mettre à jour le document
 @app.route('/documents/<id>/update', methods=['POST'])
 def update_document(id):
     data = request.form  # Récupérer les données envoyées via le formulaire
+
+    # Vérification si les données sont présentes
+    if not data:
+        return "Aucune donnée fournie", 400
+
+    # Mettre à jour le document avec les nouvelles données
     result = document.update_document(id, data, mongo)
+
     return redirect('/documents')  # Rediriger vers la liste des documents après modification
+
 
 @app.route('/documents/<id>/', methods=['PUT'])
 def update_document_route(id):
@@ -156,17 +167,20 @@ def update_document_route(id):
         return render_template('documents/update.html', document=data)
     return jsonify({"message": "Document non trouvé"}), 404
 
-# Route pour supprimer un document
-'''@app.route('/documents/<id>', methods=['DELETE'])
-def delete_document_route(id):
-    result = document.delete_document(id, mongo)
-    return jsonify(result)'''
 
-@app.route('/documents/<id>', methods=['GET'])
+@app.route('/documents/<id>/delete', methods=['GET'])
 def delete_document_route(id):
-    result = document.delete_document(id, mongo)
-    return redirect('/documents')  # Rediriger vers la liste des documents après suppression
+    try:
+        # Appel à la fonction delete_document dans document.py
+        result = document.delete_document(id, mongo)
 
+        # Vérifie si la suppression a réussi
+        if 'message' in result:
+            return redirect('/documents')  # Redirige vers la liste des documents après la suppression
+        else:
+            return "Erreur lors de la suppression du document", 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # Exemple d'utilisation dans une route

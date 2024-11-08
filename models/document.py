@@ -1,5 +1,6 @@
 from bson import ObjectId
 
+from bson.objectid import ObjectId
 
 # CREATE - Ajouter un document
 def add_document(data, mongo):
@@ -30,18 +31,29 @@ def get_document_by_id(id, mongo):
         return document
     return None
 
-# UPDATE - Mettre à jour un document
-'''def update_document(id, data, mongo):
-    result = mongo.db.documents.update_one(
-        {"_id": ObjectId(id)},  # Utilisation de ObjectId ici
-        {"$set": data}  # Mise à jour des champs spécifiés
-    )
-    if result.modified_count > 0:
-        return {"message": "Document mis à jour avec succès!"}
-    return {"message": "Aucune modification apportée"}, 400'''
 
-# UPDATE - Modifier un document
+
+def delete_document(id, mongo):
+    """Supprimer un document dans la base de données"""
+    result = mongo.db.documents.delete_one({"_id": ObjectId(id)})
+    
+    if result.deleted_count > 0:
+        return {"message": "Document supprimé avec succès!"}
+    else:
+        return {"message": "Document non trouvé"}, 404
+
+
+
+
+
+
+
+def get_document_by_id(id,mongo):
+    """Récupérer un document par son ID"""
+    return mongo.db.documents.find_one({"_id": ObjectId(id)})
+
 def update_document(id, data, mongo):
+    """Mettre à jour un document dans la base de données"""
     updated_document = {
         "titre": data['titre'],
         "auteur": data['auteur'],
@@ -49,12 +61,8 @@ def update_document(id, data, mongo):
         "date_publication": data['date_publication'],
         "disponibilite": data['disponibilite']
     }
-    mongo.db.documents.update_one({"_id": ObjectId(id)}, {"$set": updated_document})
-    return {"message": "Document mis à jour avec succès!"}
 
-# DELETE - Supprimer un document
-def delete_document(id, mongo):
-    result = mongo.db.documents.delete_one({"_id": ObjectId(id)})  # Utilisation de ObjectId ici
-    if result.deleted_count > 0:
-        return {"message": "Document supprimé avec succès!"}
-    return {"message": "Document non trouvé"}, 404
+    # Mise à jour du document dans la base de données
+    mongo.db.documents.update_one({"_id": ObjectId(id)}, {"$set": updated_document})
+
+    return {"message": "Document mis à jour avec succès!"}

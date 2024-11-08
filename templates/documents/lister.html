@@ -50,7 +50,7 @@
         var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer ce document ?");
         if (confirmAction) {
             // Si l'utilisateur confirme, rediriger vers la route de suppression
-            window.location.href = '/documents';
+            window.location.href = '/documents/' + id + '/delete';
         }
     }
 </script>
