@@ -1,25 +1,60 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter un Abonné</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Assurez-vous d'avoir un fichier CSS -->
+    <title>Liste des Abonnés</title>
+    <!-- Inclure Bootstrap ou autres styles si nécessaire -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Ajouter un nouvel abonné</h1>
-    <form action="/add_abonne" method="post">
-        <label for="nom">Nom:</label>
-        <input type="text" id="nom" name="nom" required><br>
 
-        <label for="prenom">Prénom:</label>
-        <input type="text" id="prenom" name="prenom" required><br>
+<div class="container mt-4">
+    <h1>Liste des Abonnés</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Adresse</th>
+                <th>Date de inscription</th>
+              
+            </tr>
+        </thead>
+        <tbody>
+            {% for ab in abonnes %}
+            <tr>
+                <td>{{ ab.nom}}</td>
+                <td>{{ ab.prenom }}</td>
+                <td>{{ ab.adresse }}</td>
+                <td>{{ ab.date_inscription }}</td>
+              
+                <td>
+                    <a href="/abones/{{ ab._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
+                    <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ ab._id }}')">Supprimer</a>
+                    <a href="/abonnes/{{ ab._id }}/" class="btn btn-info btn-sm">Détails</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-        <label for="adresse">Adresse:</label>
-        <input type="text" id="adresse" name="adresse" required><br>
+    <a href="/add_abonne" class="btn btn-primary mt-3">Ajouter un Abonné</a>
+</div>
 
-        <button type="submit">Ajouter</button>
-    </form>
+<!-- Ajout d'un script JavaScript pour la confirmation -->
+<script>
+    function confirmDelete(id) {
+        // Demander à l'utilisateur de confirmer la suppression
+        var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer ce abonné?");
+        if (confirmAction) {
+            // Si l'utilisateur confirme, rediriger vers la route de suppression
+            window.location.href = '/abonnes/' + id + '/delete';
+        }
+    }
+</script>
+
 </body>
 </html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Abonnés</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Liste des Abonnés</h1>
+    <a href="/add_abonne" class="btn btn-primary mb-3">Ajouter un Abonné</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Adresse</th>
+                <th>Date d'inscription</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for abonne in abonnes %}
+                <tr>
+                    <td>{{ abonne['nom'] }}</td>
+                    <td>{{ abonne['prenom'] }}</td>
+                    <td>{{ abonne['adresse'] }}</td>
+                    <td>{{ abonne['date_inscription'] }}</td>
+                    <td>
+                        <a href="/abonnes/{{ abonne['_id'] }}" class="btn btn-info">Détails</a>
+                        <a href="/abonnes/{{ abonne['_id'] }}/update" class="btn btn-warning">Modifier</a>
+                        <form action="/abonnes/{{ abonne['_id'] }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier le Abonné</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Modifier le Abonné</h1>
+
+    <!-- Formulaire pour modifier le document -->
+    <form action="/abonnes/{{ abonne['_id'] }}/update" method="POST">
+        <div class="form-group">
+            <label for="nom">Nom :</label>
+            <input type="text" class="form-control" id="nom" name="nom" value="{{ abonne['nom'] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="prenom">Prenom :</label>
+            <input type="text" class="form-control" id="prenom" name="prenom" value="{{ abonne['prenom'] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="adresse">Adrsse :</label>
+            <input type="text" class="form-control" id="adresse" name="adresse" value="{{ abonne['adresse'] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="date_publication">Date de inscription :</label>
+            <input type="date" class="form-control" id="date_inscription"  name="date_inscription" value="{{ abonne['date_inscription'] }}" required>
+        </div>
+
+        
+
+        <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
+        <a href="/abonnes" class="btn btn-secondary">Retour à la liste</a>
+    </form>
+</div>
+
+</body>
+</html>
