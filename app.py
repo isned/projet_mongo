@@ -234,43 +234,6 @@ def show_update_emprunt_form(id):
     else:
         return "Emprunt non trouvé", 404
 
-# Route pour mettre à jour un abonné
-'''@app.route('/emprunts/<id>/update', methods=['POST'])
-def update_emprunt(id):
-    data = request.form
-    if not data:
-        return "Aucune donnée fournie", 400
-    result = emprunt.update_emprunt(id, data, mongo)
-    return redirect('/emprunts')'''
-
-
-
-@app.route('/emprunts/<id>/modifier', methods=['GET'])
-def modifier_emprunt(id):
-    emprunt = emprunt.get_emprunt_by_id(id, mongo)
-    if emprunt:
-        abonnes = abonne.get_abonnes(mongo)
-        documents = document.get_documents(mongo)
-        
-        # Si la date d'emprunt est en format datetime, la formater en string
-        date_emprunt = emprunt.get('date_emprunt', None)
-        if date_emprunt:
-            date_emprunt = date_emprunt.strftime('%Y-%m-%d')  # Formater en YYYY-MM-DD pour un champ <input>
-        
-        current_date = datetime.now().strftime('%Y-%m-%d')
-        return render_template('emprunts/modifier.html', emprunt=emprunt, abonnes=abonnes, documents=documents, date_emprunt=date_emprunt, current_date=current_date)
-    
-    return jsonify({"message": "Emprunt non trouvé"}), 404
-
-# Route pour supprimer un abonné
-@app.route('/emprunts/<id>/delete', methods=['GET'])
-def delete_emprunt_route(id):
-    result = emprunt.delete_emprunt(id, mongo)
-    if 'message' in result:
-        return redirect('/emprunts')
-    else:
-        return "Erreur lors de la suppression", 404
-
 
 
 @app.route('/add_emprunt', methods=['GET'])

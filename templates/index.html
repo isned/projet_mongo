@@ -25,34 +25,50 @@
         </div>
 
         <!-- Liste des emprunts -->
-        <table>
+        <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Nom Abonné</th>
-                    <th>Titre Document</th>
+                    <th>Nom de l'Abonné</th>
+                    <th>Titre du Document</th>
                     <th>Date Emprunt</th>
-                    <th>Date Retour</th>
+                    <th>Date Retour Prévu</th>
                     <th>Statut</th>
-                    <th>Actions</th>
+                    
                 </tr>
             </thead>
             <tbody>
-                {% for emprunt in emprunts %}
+                {% for em in emprunts %}
                 <tr>
-                    <td>{{ emprunt.nom_abonne }}</td>
-                    <td>{{ emprunt.titre_document }}</td>
-                    <td>{{ emprunt.date_emprunt }}</td>
-                    <td>{{ emprunt.date_retour }}</td>
-                    <td>{{ emprunt.statut }}</td>
-                    <td><button>Détails</button></td>
+                    <td>{{ em.abonne.nom }} {{ em.abonne.prenom }}</td>
+                    <td>{{ em.document.titre }}</td>
+                    <td>{{ em.date_emprunt }}</td>
+                    <td>{{ em.date_retour_prevu }}</td>
+                    <td>{{ em.statut }}</td>
+                   
                 </tr>
-                
                 {% endfor %}
             </tbody>
         </table>
-
       
-        <a href="/add_emprunt" class="btn btn-primary mt-3">Ajouter un emprunt</a>
+      
     </main>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

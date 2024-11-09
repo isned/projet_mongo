@@ -117,3 +117,6 @@ def update_emprunt(id, data, mongo):
     }
     mongo.db.emprunts.update_one({"_id": ObjectId(id)}, {"$set": updated_emprunt})
     return {"message": "Emprunt mis à jour avec succès!"}
+
+
+

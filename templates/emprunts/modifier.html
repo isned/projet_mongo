@@ -17,7 +17,7 @@
             <label for="abonne_id">Abonné :</label>
             <select class="form-control" id="abonne_id" name="abonne_id" required>
                 {% for abonne in abonnes %}
-                    <option value="{{ abonne._id }}">{{ abonne.nom }} {{ abonne.prenom }}</option>
+                    <option value="{{ abonne['_id'] }}" {% if abonne['_id'] == emprunt['abonne_id'] %} selected {% endif %}>{{ abonne.nom }} {{ abonne.prenom }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -27,7 +27,7 @@
             <label for="document_id">Document :</label>
             <select class="form-control" id="document_id" name="document_id" required>
                 {% for document in documents %}
-                    <option value="{{ document._id }}">{{ document.titre }}</option>
+                    <option value="{{ document['_id'] }}" {% if document['_id'] == emprunt['document_id'] %} selected {% endif %}>{{ document.titre }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -35,13 +35,13 @@
         <!-- Date de retour prévue -->
         <div class="form-group">
             <label for="date_retour_prevu">Date de retour prévue :</label>
-            <input type="date" class="form-control" id="date_retour_prevu" name="date_retour_prevu" required>
+            <input type="date" class="form-control" id="date_retour_prevu" name="date_retour_prevu" value="{{ emprunt['date_retour_prevu'] }}" required>
         </div>
 
         <!-- Date d'emprunt -->
         <div class="form-group">
             <label for="date_emprunt">Date d'emprunt :</label>
-            <input type="date" class="form-control" id="date_emprunt" name="date_emprunt" value="{{ current_date }}" disabled>
+            <input type="date" class="form-control" id="date_emprunt" name="date_emprunt" value="{{ date_emprunt }}" disabled>
         </div>
 
         <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
