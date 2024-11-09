@@ -18,12 +18,17 @@ mongo = PyMongo(app)
 
 
 
-# Route principale
 @app.route('/')
 def home():
+    # Récupérer tous les emprunts
     emprunts = emprunt.get_emprunts(mongo) 
-    return render_template('index.html')
-
+    
+    # Récupérer tous les abonnés et documents pour les lier aux emprunts
+    abonnes = {str(abonne['_id']): abonne for abonne in mongo.db.abonnes.find()}
+    documents = {str(document['_id']): document for document in mongo.db.documents.find()}
+    
+    # Passer les emprunts et les informations supplémentaires au template
+    return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents)
 
 
 

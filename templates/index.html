@@ -21,8 +21,9 @@
     <main>
         <!-- Barre de recherche -->
         <div class="search-bar">
-            <input type="text" placeholder="Rechercher un emprunt..." id="searchInput">
-            <button onclick="searchEmprunts()">Rechercher</button>
+            <!-- Recherche par titre -->
+            <input type="text" placeholder="Rechercher un emprunt par titre..." id="searchInputTitre">
+            <button onclick="searchByTitle()">Rechercher</button>
         </div>
 
         <!-- Liste des emprunts -->
@@ -34,7 +35,6 @@
                     <th>Date Emprunt</th>
                     <th>Date Retour Prévu</th>
                     <th>Statut</th>
-                    
                 </tr>
             </thead>
             <tbody>
@@ -45,31 +45,32 @@
                     <td>{{ em.date_emprunt }}</td>
                     <td>{{ em.date_retour_prevu }}</td>
                     <td>{{ em.statut }}</td>
-                   
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-      
-      
     </main>
+
+    <script>
+        function searchByTitle() {
+            // Récupérer la valeur du champ de recherche
+            var searchValue = document.getElementById("searchInputTitre").value.toLowerCase();
+            
+            // Récupérer toutes les lignes du tableau
+            var rows = document.querySelectorAll("table tbody tr");
+
+            rows.forEach(function(row) {
+                var titleCell = row.cells[1]; // La cellule du titre est la deuxième
+                var title = titleCell.textContent.toLowerCase();
+                
+                // Afficher ou masquer les lignes en fonction de la recherche
+                if (title.includes(searchValue)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
