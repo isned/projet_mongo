@@ -48,3 +48,23 @@ def update_abonne(id, data, mongo):
     }
     mongo.db.abonnes.update_one({"_id": ObjectId(id)}, {"$set": updated_abonne})
     return {"message": "Abonné mis à jour avec succès!"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+def get_abonnes(mongo):
+    abonnes = mongo.db.abonnes.find()
+    result = []
+    for abonne in abonnes:
+        abonne['_id'] = str(abonne['_id'])  # Convertir l'ObjectId en string
+        result.append(abonne)
+    return result

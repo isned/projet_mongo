@@ -15,8 +15,8 @@
         <div class="card-body">
            
            
-            <p><strong>Nom de abonne</strong> {{ emprunt.nom }}</p>
-            <p><strong>Titre de document</strong> {{ emprunt.titre}}</p>
+            <p><strong>Nom de abonne</strong> {{ emprunt.abonne.nom }} {{ emprunt.abonne.prenom }}</p>
+            <p><strong>Titre de document</strong> {{ emprunt.document.titre}}</p>
          
             <p><strong>Date de emprunt:</strong> {{ emprunt.date_emprunt}}</p>
 

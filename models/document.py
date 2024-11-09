@@ -66,3 +66,14 @@ def update_document(id, data, mongo):
     mongo.db.documents.update_one({"_id": ObjectId(id)}, {"$set": updated_document})
 
     return {"message": "Document mis à jour avec succès!"}
+
+
+
+
+def get_documents(mongo):
+    documents = mongo.db.documents.find()
+    result = []
+    for document in documents:
+        document['_id'] = str(document['_id'])  # Convertir l'ObjectId en string
+        result.append(document)
+    return result
