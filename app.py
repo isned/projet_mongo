@@ -205,6 +205,8 @@ def delete_document_route(id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+
 @app.route('/emprunts', methods=['GET'])
 def emprunts_lister():
     emprunts = emprunt.get_emprunts(mongo)  # Récupère tous les documents
@@ -246,42 +248,40 @@ def delete_emprunt_route(id):
     else:
         return "Erreur lors de la suppression", 404
 
-# Route pour ajouter un abonné
+
+
+# Afficher le formulaire d'ajout de document
 @app.route('/add_emprunt', methods=['GET'])
 def show_add_emprunt_form():
     return render_template('emprunts/ajouter.html')
 
-@app.route('/add_emprunt', methods=['GET', 'POST'])
-def add_emprunt():
-    if request.method == 'POST':
-        # Récupérer les données du formulaire
+
+@app.route('/add_emprunt', methods=['POST'])
+def add_emprunt_route():
+    # Récupérer les données du formulaire via request.form
         abonne_id = request.form['abonne_id']
         document_id = request.form['document_id']
         date_retour_prevu = request.form['date_retour_prevu']
         date_emprunt = datetime.now()
-
         # Convertir la date de retour prévue en objet datetime
         date_retour_prevu = datetime.strptime(date_retour_prevu, '%Y-%m-%d')
 
         # Vérifier si la date de retour est antérieure à la date d'emprunt
         if date_retour_prevu < date_emprunt:
             return "La date de retour ne peut pas être antérieure à la date d'emprunt", 400
-
-        # Ajoutez ici votre logique pour enregistrer l'emprunt dans MongoDB
-        emprunt.add_emprunt_to_db(abonne_id, document_id, date_retour_prevu,mongo)
-
-        return redirect('/emprunts')  # Rediriger après ajout
-
-    # Récupérer les abonnés et les documents depuis la base de données
-    abonnes = mongo.db.abonnes.find()  # Obtenez la liste des abonnés
-    documents = mongo.db.documents.find()  # Obtenez la liste des documents
-
-    # Renvoyer la page avec les données nécessaires
-    return render_template('emprunts/ajouter.html', abonnes=abonnes, documents=documents)
-
-
-
-
+        data = {
+            'abonne_id': abonne_id,
+            'document_id': document_id,
+            'date_emprunt': date_emprunt,
+            'date_retour_prevu': date_retour_prevu,
+            'statut': 'emprunté'
+        }
+    
+    # Ajouter le document à la base de données
+        result = emprunt.add_emprunt(data, mongo)
+    
+    # Rediriger vers la page de liste des documents après ajout
+        return redirect('/emprunts')
 
 
 

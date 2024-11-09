@@ -9,7 +9,6 @@ def add_emprunt(data, mongo):
         "document_id": data['document_id'],
         "date_emprunt": datetime.now(),
         "date_retour_prevu": data['date_retour_prevu'],
-       
         "statut": "emprunté"
     }
     mongo.db.emprunts.insert_one(emprunt)
