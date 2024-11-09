@@ -213,7 +213,7 @@ def emprunts_lister():
     return render_template('emprunts/lister.html', emprunts=emprunts)
 
 # Route pour récupérer un abonné par ID
-@app.route('/empruntss/<id>/', methods=['GET'])
+@app.route('/emprunts/<id>/', methods=['GET'])
 def show_emprunt_details(id):
     em = emprunt.get_emprunt_by_id(id, mongo)
     if em:
@@ -250,10 +250,11 @@ def delete_emprunt_route(id):
 
 
 
-# Afficher le formulaire d'ajout de document
 @app.route('/add_emprunt', methods=['GET'])
 def show_add_emprunt_form():
-    return render_template('emprunts/ajouter.html')
+    abonnes = list(mongo.db.abonnes.find())
+    documents = list(mongo.db.documents.find())
+    return render_template('emprunts/ajouter.html', abonnes=abonnes, documents=documents)
 
 
 @app.route('/add_emprunt', methods=['POST'])
