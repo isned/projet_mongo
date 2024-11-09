@@ -207,10 +207,31 @@ def delete_document_route(id):
 
 
 
-@app.route('/emprunts', methods=['GET'])
+'''@app.route('/emprunts', methods=['GET'])
 def emprunts_lister():
     emprunts = emprunt.get_emprunts(mongo)  # Récupère tous les documents
-    return render_template('emprunts/lister.html', emprunts=emprunts)
+    return render_template('emprunts/lister.html', emprunts=emprunts)'''
+
+
+
+@app.route('/emprunts', methods=['GET'])
+def liste_emprunts():
+    emprunts = mongo.db.emprunts.find()
+    liste_emprunts_complets = []
+
+    for em in emprunts:
+        abonne = mongo.db.abonnes.find_one({"_id": em['abonne_id']})
+        document = mongo.db.documents.find_one({"_id": em['document_id']})
+        liste_emprunts_complets.append({
+            'abonne': abonne,
+            'document': document,
+            'date_emprunt': em['date_emprunt'],
+            'date_retour_prevu': em['date_retour_prevu'],
+            'statut': em['statut'],
+            '_id': em['_id']
+        })
+
+    return render_template('emprunts/lister.html', emprunts=liste_emprunts_complets)
 
 # Route pour récupérer un abonné par ID
 @app.route('/emprunts/<id>/', methods=['GET'])
@@ -254,7 +275,8 @@ def delete_emprunt_route(id):
 def show_add_emprunt_form():
     abonnes = list(mongo.db.abonnes.find())
     documents = list(mongo.db.documents.find())
-    return render_template('emprunts/ajouter.html', abonnes=abonnes, documents=documents)
+    current_date = datetime.now().strftime('%Y-%m-%d')  # Format de la date pour le champ input
+    return render_template('emprunts/ajouter.html', abonnes=abonnes, documents=documents,current_date=current_date)
 
 
 @app.route('/add_emprunt', methods=['POST'])
@@ -262,8 +284,9 @@ def add_emprunt_route():
     # Récupérer les données du formulaire via request.form
         abonne_id = request.form['abonne_id']
         document_id = request.form['document_id']
-        date_retour_prevu = request.form['date_retour_prevu']
         date_emprunt = datetime.now()
+        date_retour_prevu = request.form['date_retour_prevu']
+        
         # Convertir la date de retour prévue en objet datetime
         date_retour_prevu = datetime.strptime(date_retour_prevu, '%Y-%m-%d')
 

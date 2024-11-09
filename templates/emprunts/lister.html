@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des Emprunts</title>
-    <!-- Inclure Bootstrap ou autres styles si nécessaire -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
@@ -14,26 +13,23 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>ID Abonné</th>
-                <th>ID Document</th>
+                <th>Nom de l'Abonné</th>
+                <th>Titre du Document</th>
                 <th>Date Emprunt</th>
                 <th>Date Retour Prévu</th>
                 <th>Statut</th>
                 <th>Actions</th>
-
-
-                
             </tr>
         </thead>
         <tbody>
             {% for em in emprunts %}
             <tr>
-                <td>{{ em.abonne_id }}</td>
-                <td>{{ em.document_id }}</td>
-                <td>{{ em.date_emprunt}}</td>
+                <td>{{ em.abonne.nom }} {{ em.abonne.prenom }}</td>
+                <td>{{ em.document.titre }}</td>
+                <td>{{ em.date_emprunt }}</td>
                 <td>{{ em.date_retour_prevu }}</td>
                 <td>{{ em.statut }}</td>
-
+                <td>
                     <a href="/emprunts/{{ em._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
                     <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ em._id }}')">Supprimer</a>
                     <a href="/emprunts/{{ em._id }}/" class="btn btn-info btn-sm">Détails</a>
@@ -46,13 +42,10 @@
     <a href="/add_emprunt" class="btn btn-primary mt-3">Ajouter un emprunt</a>
 </div>
 
-<!-- Ajout d'un script JavaScript pour la confirmation -->
 <script>
     function confirmDelete(id) {
-        // Demander à l'utilisateur de confirmer la suppression
-        var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer cette emprunts ?");
+        var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer cet emprunt ?");
         if (confirmAction) {
-            // Si l'utilisateur confirme, rediriger vers la route de suppression
             window.location.href = '/emprunts/' + id + '/delete';
         }
     }
