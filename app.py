@@ -21,6 +21,7 @@ mongo = PyMongo(app)
 # Route principale
 @app.route('/')
 def home():
+    emprunts = emprunt.get_emprunts(mongo) 
     return render_template('index.html')
 
 
