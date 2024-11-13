@@ -14,27 +14,25 @@
     <table class="table table-striped">
         <thead>
             <tr>
-               
                 <th>Genre</th>
-               
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for g in genres %}
             <tr>
-                <td>{{ g.genre }}</td>
+                <td>{{ g.genre_name }}</td>  <!-- Changer genre en genre_name -->
                 <td>
-                    <a href="/genres/{{ g._id }}" class="btn btn-info btn-sm">Détails</a>
                     <a href="/genres/{{ g._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
                     <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ g._id }}')">Supprimer</a>
+                    <a href="/genres/{{ g._id }}/" class="btn btn-info btn-sm">Détails</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
-        
     </table>
 
-    <a href="/add_genre" class="btn btn-primary mt-3">Ajouter un Genre</a>
+    <a href="/add_genre" class="btn btn-primary mt-3">Ajouter un genre</a>
     <a href="/" class="btn btn-primary mt-3">Retour</a>
 </div>
 

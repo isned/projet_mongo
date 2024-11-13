@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifier le genre</title>
+    <title>Modifier le Genre</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
@@ -11,16 +11,11 @@
 <div class="container mt-4">
     <h1>Modifier le genre</h1>
 
-    <!-- Formulaire pour modifier le document -->
     <form action="/genres/{{ genre['_id'] }}/update" method="POST">
-       
-
         <div class="form-group">
-            <label for="genre">Genre :</label>
-            <input type="text" class="form-control" id="genre" name="genre" value="{{ genre['genre'] }}" required>
+            <label for="genre_name">Genre :</label>  <!-- Changer genre en genre_name -->
+            <input type="text" class="form-control" id="genre_name" name="genre_name" value="{{ genre['genre_name'] }}" required> <!-- Changer genre en genre_name -->
         </div>
-
-       
 
         <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
         <a href="/genres" class="btn btn-secondary">Retour à la liste</a>

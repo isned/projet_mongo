@@ -26,9 +26,10 @@ def home():
     # Récupérer tous les abonnés et documents pour les lier aux emprunts
     abonnes = {str(abonne['_id']): abonne for abonne in mongo.db.abonnes.find()}
     documents = {str(document['_id']): document for document in mongo.db.documents.find()}
+    genres = {str(genre['_id']): genre for genre in mongo.db.genres.find()}
     
     # Passer les emprunts et les informations supplémentaires au template
-    return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents)
+    return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents,genres=genres)
 
 
 
@@ -313,35 +314,12 @@ def delete_emprunt_route(id):
 
 
 
-
-
-@app.route('/add_genre', methods=['GET'])
-def show_add_genre_form():
-    return render_template('genres/ajouter.html')
-
-@app.route('/add_genre', methods=['POST'])
-def add_genre_route():
-    # Vérifiez que le formulaire a été soumis avec la clé 'genre'
-    if 'genre' not in request.form:
-        return jsonify({"error": "La clé 'genre' est manquante dans la requête"}), 400
-
-    genre = request.form['genre']
-    # Logique pour ajouter le genre, par exemple l'insérer dans une base de données...
-    
-    return jsonify({"message": "Genre ajouté avec succès!"})
-
-
-
-
 @app.route('/genres', methods=['GET'])
 def genres_lister():
-    genres = genre.get_genres(mongo)  # Vérifiez que cette fonction retourne une liste correcte
-    if not genres:
-        genres = []  # Assurez-vous qu'il n'y a pas d'erreur en retournant une liste vide par défaut
+    genres = genre.get_genres(mongo)  # Récupère tous les documents
     return render_template('genres/lister.html', genres=genres)
 
-
-# Route pour afficher un genre par ID
+# Route pour récupérer un genre par ID
 @app.route('/genres/<id>/', methods=['GET'])
 def show_genre_details(id):
     g = genre.get_genre_by_id(id, mongo)
@@ -350,9 +328,9 @@ def show_genre_details(id):
     else:
         return "Genre non trouvé", 404
 
-# Route pour afficher le formulaire de modification
+# Route pour afficher la page de modification
 @app.route('/genres/<id>/update', methods=['GET'])
-def show_update_form_genre(id):
+def show_update_genre_form(id):
     genre_to_update = genre.get_genre_by_id(id, mongo)
     if genre_to_update:
         return render_template('genres/modifier.html', genre=genre_to_update)
@@ -360,31 +338,38 @@ def show_update_form_genre(id):
         return "Genre non trouvé", 404
 
 # Route pour mettre à jour un genre
-@app.route('/genres/<id>/update', methods=['POST'])
+@app.route('/genres/<id>/update', methods=['POST'])  # Correction du chemin '/gernes' en '/genres'
 def update_genre(id):
-    if 'genre' not in request.form:
-        return jsonify({"error": "La clé 'genre' est manquante dans la requête"}), 400
-
-    genre_data = request.form['genre']
-    result = genre.update_genre(id, genre_data, mongo)
-
-    if result:
-        return redirect('/genres')
-    else:
-        return "Erreur lors de la mise à jour du genre", 500
+    data = request.form
+    if not data:
+        return "Aucune donnée fournie", 400
+    result = genre.update_genre(id, data, mongo)
+    return redirect('/genres')
 
 # Route pour supprimer un genre
 @app.route('/genres/<id>/delete', methods=['GET'])
 def delete_genre_route(id):
-    try:
-        result = genre.delete_genre(id, mongo)
-        if result and 'message' in result:
-            return redirect('/genres')
-        else:
-            return "Erreur lors de la suppression du genre", 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    result = genre.delete_genre(id, mongo)
+    if 'message' in result:
+        return redirect('/genres')  # Correction de la redirection '/genre' en '/genres'
+    else:
+        return "Erreur lors de la suppression", 404
 
+# Route pour ajouter un genre
+@app.route('/add_genre', methods=['GET'])
+def show_add_genre_form():
+    return render_template('genres/ajouter.html')
+
+@app.route('/add_genre', methods=['POST'])
+def add_genre_route():
+    genre_name = request.form['genre_name']  # Changement de 'genre' en 'genre_name'
+    
+    data = {
+        'genre_name': genre_name,  # Utilisation de 'genre_name' au lieu de 'genre'
+    }
+    
+    result = genre.add_genre(data, mongo)
+    return redirect('/genres')
 
 
 
