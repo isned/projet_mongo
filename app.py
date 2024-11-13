@@ -1,7 +1,7 @@
 from flask import Flask, redirect, render_template, request, jsonify
 from flask_pymongo import PyMongo
 from config import Config
-from models import abonne
+from models import abonne, genre
 from models import document
 from models import emprunt
 from datetime import datetime
@@ -246,6 +246,7 @@ def show_update_emprunt_form(id):
 def show_add_emprunt_form():
     abonnes = list(mongo.db.abonnes.find())
     documents = list(mongo.db.documents.find())
+    documents_disponibles = mongo.db.documents.find({"statut": "disponible"})
     current_date = datetime.now().strftime('%Y-%m-%d')  # Format de la date pour le champ input
     return render_template('emprunts/ajouter.html', abonnes=abonnes, documents=documents,current_date=current_date)
 
@@ -282,7 +283,107 @@ def add_emprunt_route():
 
 
 
+# Route pour supprimer un abonné
+@app.route('/emprunts/<id>/delete', methods=['GET'])
+def delete_emprunt_route(id):
+    result = emprunt.delete_emprunt(id, mongo)
+    if 'message' in result:
+        return redirect('/emprunts')
+    else:
+        return "Erreur lors de la suppression", 404
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/add_genre', methods=['GET'])
+def show_add_genre_form():
+    return render_template('genres/ajouter.html')
+
+@app.route('/add_genre', methods=['POST'])
+def add_genre_route():
+    # Vérifiez que le formulaire a été soumis avec la clé 'genre'
+    if 'genre' not in request.form:
+        return jsonify({"error": "La clé 'genre' est manquante dans la requête"}), 400
+
+    genre = request.form['genre']
+    # Logique pour ajouter le genre, par exemple l'insérer dans une base de données...
+    
+    return jsonify({"message": "Genre ajouté avec succès!"})
+
+
+
+
+@app.route('/genres', methods=['GET'])
+def genres_lister():
+    genres = genre.get_genres(mongo)  # Vérifiez que cette fonction retourne une liste correcte
+    if not genres:
+        genres = []  # Assurez-vous qu'il n'y a pas d'erreur en retournant une liste vide par défaut
+    return render_template('genres/lister.html', genres=genres)
+
+
+# Route pour afficher un genre par ID
+@app.route('/genres/<id>/', methods=['GET'])
+def show_genre_details(id):
+    g = genre.get_genre_by_id(id, mongo)
+    if g:
+        return render_template('genres/details.html', genre=g)
+    else:
+        return "Genre non trouvé", 404
+
+# Route pour afficher le formulaire de modification
+@app.route('/genres/<id>/update', methods=['GET'])
+def show_update_form_genre(id):
+    genre_to_update = genre.get_genre_by_id(id, mongo)
+    if genre_to_update:
+        return render_template('genres/modifier.html', genre=genre_to_update)
+    else:
+        return "Genre non trouvé", 404
+
+# Route pour mettre à jour un genre
+@app.route('/genres/<id>/update', methods=['POST'])
+def update_genre(id):
+    if 'genre' not in request.form:
+        return jsonify({"error": "La clé 'genre' est manquante dans la requête"}), 400
+
+    genre_data = request.form['genre']
+    result = genre.update_genre(id, genre_data, mongo)
+
+    if result:
+        return redirect('/genres')
+    else:
+        return "Erreur lors de la mise à jour du genre", 500
+
+# Route pour supprimer un genre
+@app.route('/genres/<id>/delete', methods=['GET'])
+def delete_genre_route(id):
+    try:
+        result = genre.delete_genre(id, mongo)
+        if result and 'message' in result:
+            return redirect('/genres')
+        else:
+            return "Erreur lors de la suppression du genre", 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un genre</title>
+    <!-- Ajouter le stylesheet Bootstrap pour la mise en forme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Ajouter un genre</h1>
+
+    <!-- Formulaire pour ajouter un genre -->
+    <form action="/add_genre" method="POST">
+        <div class="form-group">
+            <label for="genre">Genre :</label>
+            <input type="text" class="form-control" id="genre" name="genre" placeholder="Genre" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+        <a href="/genres" class="btn btn-secondary">Retour à la liste des genres</a>
+    </form>
+</div>
+
+</body> 
+</html>

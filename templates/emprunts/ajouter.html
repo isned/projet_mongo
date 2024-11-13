@@ -30,13 +30,13 @@
         <div class="form-group">
             <label for="document_id">Document :</label>
            
-<select class="form-control" id="document_id" name="document_id" required>
-    {% for document in documents %}
-        <option value="{{ document._id }}">{{ document.titre }}</option>
-    {% else %}
-        <option disabled>Aucun document trouvé</option>
-    {% endfor %}
-</select>
+            <select class="form-control" id="document_id" name="document_id" required>
+                {% for document in documents %}
+                    <option value="{{ document._id }}">{{ document.titre }}</option>
+                {% else %}
+                    <option disabled>Aucun document trouvé</option>
+                {% endfor %}
+            </select>
         </div>
 
 <!-- Date d'emprunt -->
