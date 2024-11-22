@@ -1,11 +1,14 @@
 from datetime import datetime
 from bson import ObjectId
 
-def add_emprunt(data, mongo):
-    # Vérifier si le document est disponible avant d'ajouter un emprunt
+
+'''def add_emprunt(data, mongo):
+    # Check if the document is available before adding the loan
     document = mongo.db.documents.find_one({"_id": ObjectId(data['document_id'])})
-    if not document or document['statut'] != 'disponible':
+    if not document or document['statut'] != 'Disponible':
         return {"message": "Le document n'est pas disponible pour un emprunt."}, 400
+    
+    # Prepare the emprunt (loan) data
     emprunt = {
         "abonne_id": data['abonne_id'],
         "document_id": data['document_id'],
@@ -13,6 +16,28 @@ def add_emprunt(data, mongo):
         "date_retour_prevu": data['date_retour_prevu'],
         "statut": "emprunté"
     }
+    
+    # Insert the emprunt into the database
+    mongo.db.emprunts.insert_one(emprunt)'''
+
+
+
+def add_emprunt(data, mongo):
+    # Check if the document is available before adding the loan
+    document = mongo.db.documents.find_one({"_id": ObjectId(data['document_id'])})
+    if not document or document.get('statut') != 'Disponible':  # Fixed line
+        return {"message": "Le document n'est pas disponible pour un emprunt."}, 400
+    
+    # Prepare the emprunt (loan) data
+    emprunt = {
+        "abonne_id": data['abonne_id'],
+        "document_id": data['document_id'],
+        "date_emprunt": datetime.now(),
+        "date_retour_prevu": data['date_retour_prevu'],
+        "statut": "emprunté"
+    }
+    
+    # Insert the emprunt into the database
     mongo.db.emprunts.insert_one(emprunt)
 
 def get_emprunts(mongo):

@@ -261,43 +261,81 @@ def show_update_emprunt_form(id):
         return "Emprunt non trouvé", 404
 
 
-
 @app.route('/add_emprunt', methods=['GET'])
 def show_add_emprunt_form():
+    # Fetch all abonnes (members) and documents with "Disponible" status
     abonnes = list(mongo.db.abonnes.find())
-    documents = list(mongo.db.documents.find())
-    documents_disponibles = mongo.db.documents.find({"statut": "disponible"})
-    current_date = datetime.now().strftime('%Y-%m-%d')  # Format de la date pour le champ input
-    return render_template('emprunts/ajouter.html', abonnes=abonnes, documents=documents,current_date=current_date)
+    documents_disponibles = list(mongo.db.documents.find({"disponibilite": "Disponible"}))
+    
+    # Debugging: Print the fetched documents to check if they exist
+    print("Documents disponibles:", documents_disponibles)
+    
+    # Get the current date in the format needed for the input field
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    
+    # Render the form with available abonnes and documents
+    return render_template('emprunts/ajouter.html', abonnes=abonnes, documents=documents_disponibles, current_date=current_date)
 
+
+'''@app.route('/add_emprunt', methods=['POST'])
+def add_emprunt_route():
+    # Retrieve form data from the request
+    abonne_id = request.form['abonne_id']
+    document_id = request.form['document_id']
+    date_emprunt = datetime.now()
+    date_retour_prevu = request.form['date_retour_prevu']
+    
+    # Convert the planned return date to a datetime object
+    date_retour_prevu = datetime.strptime(date_retour_prevu, '%Y-%m-%d')
+
+    # Check if the planned return date is before the borrowing date
+    if date_retour_prevu < date_emprunt:
+        return "La date de retour ne peut pas être antérieure à la date d'emprunt", 400
+    
+    # Prepare the data for the new loan (emprunt)
+    data = {
+        'abonne_id': abonne_id,
+        'document_id': document_id,
+        'date_emprunt': date_emprunt,
+        'date_retour_prevu': date_retour_prevu,
+        'statut': 'emprunté'
+    }
+    
+    # Add the loan to the database using the helper function
+    result = emprunt.add_emprunt(data, mongo)
+    
+    # Redirect to the list of emprunts after adding the new loan
+    return redirect('/emprunts')'''
 
 @app.route('/add_emprunt', methods=['POST'])
 def add_emprunt_route():
-    # Récupérer les données du formulaire via request.form
-        abonne_id = request.form['abonne_id']
-        document_id = request.form['document_id']
-        date_emprunt = datetime.now()
-        date_retour_prevu = request.form['date_retour_prevu']
-        
-        # Convertir la date de retour prévue en objet datetime
-        date_retour_prevu = datetime.strptime(date_retour_prevu, '%Y-%m-%d')
+    # Retrieve form data from the request
+    abonne_id = request.form['abonne_id']
+    document_id = request.form['document_id']
+    date_emprunt = datetime.now()
+    date_retour_prevu = request.form['date_retour_prevu']
+    
+    # Convert the planned return date to a datetime object
+    date_retour_prevu = datetime.strptime(date_retour_prevu, '%Y-%m-%d')
 
-        # Vérifier si la date de retour est antérieure à la date d'emprunt
-        if date_retour_prevu < date_emprunt:
-            return "La date de retour ne peut pas être antérieure à la date d'emprunt", 400
-        data = {
-            'abonne_id': abonne_id,
-            'document_id': document_id,
-            'date_emprunt': date_emprunt,
-            'date_retour_prevu': date_retour_prevu,
-            'statut': 'emprunté'
-        }
+    # Check if the planned return date is before the borrowing date
+    if date_retour_prevu < date_emprunt:
+        return "La date de retour ne peut pas être antérieure à la date d'emprunt", 400
     
-    # Ajouter le document à la base de données
-        result = emprunt.add_emprunt(data, mongo)
+    # Prepare the data for the new loan (emprunt)
+    data = {
+        'abonne_id': abonne_id,
+        'document_id': document_id,
+        'date_emprunt': date_emprunt,
+        'date_retour_prevu': date_retour_prevu,
+        'statut': 'emprunté'
+    }
     
-    # Rediriger vers la page de liste des documents après ajout
-        return redirect('/emprunts')
+    # Add the loan to the database using the helper function
+    result = emprunt.add_emprunt(data, mongo)
+    
+    # Redirect to the list of emprunts after adding the new loan
+    return redirect('/emprunts')
 
 
 
