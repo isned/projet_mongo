@@ -233,6 +233,11 @@ def delete_document_route(id):
 
 
 
+'''@app.route('/emprunts', methods=['GET'])
+def emprunts_lister():
+    emprunts = emprunt.get_emprunts(mongo)  # Récupère tous les documents
+    return render_template('emprunts/lister.html', emprunts=emprunts)'''
+
 @app.route('/emprunts', methods=['GET'])
 def emprunts_lister():
     emprunts = emprunt.get_emprunts(mongo)  # Récupère tous les documents

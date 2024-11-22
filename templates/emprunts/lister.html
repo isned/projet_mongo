@@ -35,6 +35,10 @@
                     <a href="/emprunts/{{ em._id }}/" class="btn btn-info btn-sm">Détails</a>
                 </td>
             </tr>
+            {% else %}
+            <tr>
+                <td colspan="6">Aucun emprunt trouvé.</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
