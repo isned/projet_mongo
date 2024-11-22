@@ -185,25 +185,26 @@ def show_update_form(id):
 
 @app.route('/documents/<id>/update', methods=['POST'])
 def update_document(id):
-    # Get the form data
     data = request.form
-    genre = mongo.db.genres.find_one({"_id": ObjectId(data['genre'])})  # Match ObjectId with the form value
-
+    genre_id = ObjectId(data['genre'])  # Ensure the genre is passed as ObjectId
+    
+    # Check if the genre exists
+    genre = mongo.db.genres.find_one({"_id": genre_id})
     if not genre:
-        return "Genre non trouvé", 400  # Handle case where genre is not found
+        return "Genre non trouvé", 400
 
     updated_document = {
         "titre": data['titre'],
         "auteur": data['auteur'],
-        "genre": ObjectId(data['genre']),  # Make sure to insert ObjectId
+        "genre": genre_id,  # Correctly store the ObjectId
         "date_publication": data['date_publication'],
         "disponibilite": data['disponibilite']
     }
 
-    # Update the document
+    # Update the document in the database
     mongo.db.documents.update_one({"_id": ObjectId(id)}, {"$set": updated_document})
 
-    return redirect('/documents')  # Redirect after successful update
+    return redirect('/documents')  # Redirect to the documents list
 
 
 

@@ -44,7 +44,7 @@ def get_documents(mongo):
 
 
 
-def get_document_by_id(id, mongo):
+'''def get_document_by_id(id, mongo):
     document = mongo.db.documents.aggregate([
         {
             "$match": {
@@ -69,6 +69,34 @@ def get_document_by_id(id, mongo):
         document['_id'] = str(document['_id'])  
         document['genre'] = document['genre_info']['genre_name']  
         del document['genre_info']  
+        return document
+    return None'''
+def get_document_by_id(id, mongo):
+    document = mongo.db.documents.aggregate([
+        {
+            "$match": {
+                "_id": ObjectId(id)  # Match the document by its ID
+            }
+        },
+        {
+            "$lookup": {
+                "from": "genres",  # The collection you're joining with
+                "localField": "genre",  # The field in the documents collection
+                "foreignField": "_id",  # The field in the genres collection
+                "as": "genre_info"  # The alias for the joined result
+            }
+        },
+        {
+            "$unwind": "$genre_info"  # Unwind the genre_info array
+        }
+    ])
+    
+    document = list(document)
+    if document:
+        document = document[0]
+        document['_id'] = str(document['_id'])  # Convert _id to string
+        document['genre'] = document['genre_info']['genre_name']  # Get the genre name
+        del document['genre_info']  # Remove the genre_info field
         return document
     return None
 

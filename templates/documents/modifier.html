@@ -11,7 +11,6 @@
 <div class="container mt-4">
     <h1>Modifier le Document</h1>
 
-    <!-- Formulaire pour modifier le document -->
     <form action="/documents/{{ document['_id'] }}/update" method="POST">
         <div class="form-group">
             <label for="titre">Titre :</label>
@@ -29,7 +28,7 @@
                 <option value="">Sélectionner un genre</option>
                 {% for genre in genres %}
                     <option value="{{ genre['_id'] }}" {% if genre['_id'] == document['genre'] %}selected{% endif %}>
-                        {{ genre['genre_name'] }} <!-- Adjust to correct field name for genre -->
+                        {{ genre['genre_name'] }}
                     </option>
                 {% endfor %}
             </select>
@@ -51,6 +50,7 @@
         <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
         <a href="/documents" class="btn btn-secondary">Retour à la liste</a>
     </form>
+   
     
 </div>
 
