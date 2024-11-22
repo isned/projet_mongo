@@ -1,87 +1,106 @@
 from bson import ObjectId
 from bson.objectid import ObjectId
+from bson import ObjectId
 
-# CREATE - Ajouter un document avec un genre qui est une référence à la collection genres
 def add_document(data, mongo):
-    # Vérifier si le genre existe dans la collection genres
-    genre = mongo.db.genres.find_one({"genre": data['genre']})
     
-    # Si le genre n'existe pas, on peut le créer
-    if not genre:
-        genre = mongo.db.genres.insert_one({"genre": data['genre']})
-        genre_id = genre.inserted_id  # Récupérer l'ObjectId du genre ajouté
-    else:
-        genre_id = genre['_id']  # Récupérer l'ObjectId du genre existant
-    
-    # Créer le document en ajoutant l'ObjectId du genre
+    genre_id = ObjectId(data['genre'])  
     document = {
         "titre": data['titre'],
         "auteur": data['auteur'],
-        "genre": ObjectId(genre_id),  # Utilisation de l'ObjectId du genre
+        "genre": genre_id, 
         "date_publication": data['date_publication'],
         "disponibilite": data['disponibilite']
     }
     mongo.db.documents.insert_one(document)
     return {"message": "Document ajouté avec succès!"}
 
-# READ - Récupérer tous les documents
 def get_documents(mongo):
     documents = mongo.db.documents.aggregate([
         {
             "$lookup": {
-                "from": "genres",  # Nom de la collection genres
-                "localField": "genre",  # Champ genre dans la collection documents
-                "foreignField": "_id",  # L'ObjectId dans la collection genres
-                "as": "genre_info"  # Alias pour les informations sur le genre
+                "from": "genres",  
+                "localField": "genre",  
+                "foreignField": "_id",  
+                "as": "genre_info"  
             }
         },
         {
-            "$unwind": "$genre_info"  # Décomposer le tableau genre_info
+            "$unwind": "$genre_info"  
         }
     ])
     
     result = []
     for document in documents:
-        document['_id'] = str(document['_id'])  # Convertir l'ObjectId en string pour l'affichage
-        document['genre'] = document['genre_info']['genre']  # Remplacer le champ genre par le nom du genre
-        del document['genre_info']  # Supprimer l'alias 'genre_info'
+        document['_id'] = str(document['_id'])  
+        
+       
+        genre_name = document['genre_info'].get('genre_name', 'Nom du genre non défini')
+        document['genre'] = genre_name  
+        del document['genre_info']  
         result.append(document)
     
     return result
 
-# READ - Récupérer un document par son ID
+
+
 def get_document_by_id(id, mongo):
     document = mongo.db.documents.aggregate([
         {
             "$match": {
-                "_id": ObjectId(id)  # Chercher le document avec l'ID donné
+                "_id": ObjectId(id)  
             }
         },
         {
             "$lookup": {
-                "from": "genres",  # Nom de la collection genres
-                "localField": "genre",  # Champ genre dans la collection documents
-                "foreignField": "_id",  # L'ObjectId dans la collection genres
-                "as": "genre_info"  # Alias pour les informations sur le genre
+                "from": "genres",  
+                "localField": "genre",  
+                "as": "genre_info"  
             }
         },
         {
-            "$unwind": "$genre_info"  # Décomposer le tableau genre_info
+            "$unwind": "$genre_info"  
         }
     ])
     
     document = list(document)
     if document:
         document = document[0]
-        document['_id'] = str(document['_id'])  # Convertir l'ObjectId en string
-        document['genre'] = document['genre_info']['genre']  # Remplacer le champ genre par le nom du genre
-        del document['genre_info']  # Supprimer l'alias 'genre_info'
+        document['_id'] = str(document['_id'])  
+        document['genre'] = document['genre_info']['genre_name']  
+        del document['genre_info']  
         return document
     return None
 
-# DELETE - Supprimer un document
+
+def update_document(id, data, mongo):
+    
+    
+    genre = mongo.db.genres.find_one({"genre": data['genre']})
+    
+    
+    if not genre:
+        genre = mongo.db.genres.insert_one({"genre": data['genre']})
+        genre_id = genre.inserted_id  
+    else:
+        genre_id = genre['_id']  
+    
+   
+    updated_document = {
+        "titre": data['titre'],
+        "auteur": data['auteur'],
+        "genre": ObjectId(genre_id),  
+        "date_publication": data['date_publication'],
+        "disponibilite": data['disponibilite']
+    }
+
+   
+    mongo.db.documents.update_one({"_id": ObjectId(id)}, {"$set": updated_document})
+
+    return {"message": "Document mis à jour avec succès!"}
+
 def delete_document(id, mongo):
-    """Supprimer un document dans la base de données"""
+  
     result = mongo.db.documents.delete_one({"_id": ObjectId(id)})
     
     if result.deleted_count > 0:
@@ -89,29 +108,4 @@ def delete_document(id, mongo):
     else:
         return {"message": "Document non trouvé"}, 404
 
-# UPDATE - Mettre à jour un document
-def update_document(id, data, mongo):
-    """Mettre à jour un document dans la base de données"""
-    # Vérifier si le genre existe dans la collection genres
-    genre = mongo.db.genres.find_one({"genre": data['genre']})
-    
-    # Si le genre n'existe pas, on peut le créer
-    if not genre:
-        genre = mongo.db.genres.insert_one({"genre": data['genre']})
-        genre_id = genre.inserted_id  # Récupérer l'ObjectId du genre ajouté
-    else:
-        genre_id = genre['_id']  # Récupérer l'ObjectId du genre existant
-    
-    # Créer le document mis à jour en ajoutant l'ObjectId du genre
-    updated_document = {
-        "titre": data['titre'],
-        "auteur": data['auteur'],
-        "genre": ObjectId(genre_id),  # Utilisation de l'ObjectId du genre
-        "date_publication": data['date_publication'],
-        "disponibilite": data['disponibilite']
-    }
 
-    # Mise à jour du document dans la base de données
-    mongo.db.documents.update_one({"_id": ObjectId(id)}, {"$set": updated_document})
-
-    return {"message": "Document mis à jour avec succès!"}

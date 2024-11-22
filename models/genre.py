@@ -1,13 +1,19 @@
 from bson import ObjectId
 from datetime import datetime
 
-# CREATE - Ajouter un document
 def add_genre(data, mongo):
     genre = {
-        "genre_name": data['genre_name'],  # Changer genre en genre_name
+        "genre_name": data['genre_name'],  # Vérifiez si cette clé existe
     }
     mongo.db.genres.insert_one(genre)
     return {"message": "Genre ajouté avec succès!"}
+
+def update_genre(id, data, mongo):
+    updated_genre = {
+        "genre_name": data['genre_name'],  # Vérifiez si cette clé existe
+    }
+    mongo.db.genres.update_one({"_id": ObjectId(id)}, {"$set": updated_genre})
+    return {"message": "Genre mis à jour avec succès!"}
 
 # READ - Récupérer tous les documents
 def get_genres(mongo):
@@ -37,9 +43,9 @@ def delete_genre(id, mongo):
         return {"message": "Genre non trouvé"}, 404
 
 # UPDATE - Mettre à jour un document
-def update_genre(id, data, mongo):
+'''def update_genre(id, data, mongo):
     updated_genre = {
         "genre_name": data['genre_name'],  # Changer genre en genre_name
     }
     mongo.db.genres.update_one({"_id": ObjectId(id)}, {"$set": updated_genre})
-    return {"message": "Genre mis à jour avec succès!"}
+    return {"message": "Genre mis à jour avec succès!"}'''

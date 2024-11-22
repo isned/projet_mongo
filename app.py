@@ -117,18 +117,19 @@ def add_abonne_route():
 
 
 
-# Afficher le formulaire d'ajout de document
 @app.route('/add_document', methods=['GET'])
 def show_add_document_form():
-    return render_template('documents/ajouter.html')
+    genres = list(mongo.db.genres.find())  # Récupère tous les genres
+    print("Genres récupérés :", genres)   # Debug : Affiche les genres récupérés
+    return render_template('documents/ajouter.html', genres=genres)
 
-# Ajouter un document via POST
+
 @app.route('/add_document', methods=['POST'])
 def add_document_route():
     # Récupérer les données du formulaire via request.form
     titre = request.form['titre']
     auteur = request.form['auteur']
-    genre = request.form['genre']
+    genre_id = request.form['genre_id']  # Récupérer l'ID du genre
     date_publication = request.form['date_publication']
     disponibilite = request.form['disponibilite']
     
@@ -136,7 +137,7 @@ def add_document_route():
     data = {
         'titre': titre,
         'auteur': auteur,
-        'genre': genre,
+        'genre': genre_id,  # Assurez-vous d'utiliser l'ID du genre
         'date_publication': date_publication,
         'disponibilite': disponibilite
     }
@@ -147,10 +148,13 @@ def add_document_route():
     # Rediriger vers la page de liste des documents après ajout
     return redirect('/documents')
 
+
 @app.route('/documents', methods=['GET'])
 def documents_lister():
-    documents = document.get_documents(mongo)  # Récupère tous les documents
-    return render_template('documents/lister.html', documents=documents)
+    documents = document.get_documents(mongo) 
+    genres = list(mongo.db.genres.find())  # Récupère tous les genres
+   
+    return render_template('documents/lister.html', documents=documents,genres=genres)
 
 
 
@@ -165,29 +169,43 @@ def show_document_details(id):
     else:
         return "Document non trouvé", 404  # Si le document n'est pas trouvé
 
-# Route pour afficher la page de modification
 @app.route('/documents/<id>/update', methods=['GET'])
 def show_update_form(id):
-    # Récupérer le document à partir de la base de données
-    document_to_update = document.get_document_by_id(id,mongo)
+    # Get the document by ID
+    document_to_update = document.get_document_by_id(id, mongo)
+    
     if document_to_update:
-        return render_template('documents/modifier.html', document=document_to_update)
+        # Get all genres
+        genres = mongo.db.genres.find()
+        return render_template('documents/modifier.html', document=document_to_update, genres=genres)
     else:
         return "Document non trouvé", 404
 
-# Route pour mettre à jour le document
+
+
 @app.route('/documents/<id>/update', methods=['POST'])
 def update_document(id):
-    data = request.form  # Récupérer les données envoyées via le formulaire
+    # Get the form data
+    data = request.form
+    genre = mongo.db.genres.find_one({"_id": ObjectId(data['genre'])})  # Match ObjectId with the form value
 
-    # Vérification si les données sont présentes
-    if not data:
-        return "Aucune donnée fournie", 400
+    if not genre:
+        return "Genre non trouvé", 400  # Handle case where genre is not found
 
-    # Mettre à jour le document avec les nouvelles données
-    result = document.update_document(id, data, mongo)
+    updated_document = {
+        "titre": data['titre'],
+        "auteur": data['auteur'],
+        "genre": ObjectId(data['genre']),  # Make sure to insert ObjectId
+        "date_publication": data['date_publication'],
+        "disponibilite": data['disponibilite']
+    }
 
-    return redirect('/documents')  # Rediriger vers la liste des documents après modification
+    # Update the document
+    mongo.db.documents.update_one({"_id": ObjectId(id)}, {"$set": updated_document})
+
+    return redirect('/documents')  # Redirect after successful update
+
+
 
 
 @app.route('/documents/<id>/', methods=['PUT'])
@@ -358,6 +376,7 @@ def delete_genre_route(id):
 # Route pour ajouter un genre
 @app.route('/add_genre', methods=['GET'])
 def show_add_genre_form():
+    
     return render_template('genres/ajouter.html')
 
 @app.route('/add_genre', methods=['POST'])
