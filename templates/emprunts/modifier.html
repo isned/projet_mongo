@@ -35,19 +35,23 @@
         <!-- Date de retour prévue -->
         <div class="form-group">
             <label for="date_retour_prevu">Date de retour prévue :</label>
-            <input type="date" class="form-control" id="date_retour_prevu" name="date_retour_prevu" value="{{ emprunt['date_retour_prevu'] }}" required>
+            <input type="date" class="form-control" id="date_retour_prevu" name="date_retour_prevu" value="{{ date_retour_prevu }}" required>
         </div>
 
         <!-- Date d'emprunt -->
         <div class="form-group">
             <label for="date_emprunt">Date d'emprunt :</label>
-            <input type="date" class="form-control" id="date_emprunt" name="date_emprunt" value="{{ date_emprunt }}" disabled>
+            <input type="date" class="form-control" id="date_emprunt" name="date_emprunt" value="{{ emprunt['date_emprunt'].strftime('%Y-%m-%d') }}" disabled>
         </div>
 
         <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
         <a href="/emprunts" class="btn btn-secondary">Retour à la liste</a>
+
+
+        
     </form>
 </div>
 
 </body>
 </html>
+

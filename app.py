@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request, jsonify
+from flask import Flask, redirect, render_template, request, jsonify, url_for
 from flask_pymongo import PyMongo
 from config import Config
 from models import abonne, genre
@@ -233,10 +233,7 @@ def delete_document_route(id):
 
 
 
-'''@app.route('/emprunts', methods=['GET'])
-def emprunts_lister():
-    emprunts = emprunt.get_emprunts(mongo)  # Récupère tous les documents
-    return render_template('emprunts/lister.html', emprunts=emprunts)'''
+
 
 @app.route('/emprunts', methods=['GET'])
 def emprunts_lister():
@@ -257,13 +254,54 @@ def show_emprunt_details(id):
         return "Emprunt non trouvé", 404
 
 # Route pour afficher la page de modification
-@app.route('/emprunts/<id>/update', methods=['GET'])
+'''@app.route('/emprunts/<id>/update', methods=['GET'])
 def show_update_emprunt_form(id):
     emprunt_to_update = emprunt.get_emprunt_by_id(id, mongo)
     if emprunt_to_update:
         return render_template('emprunts/modifier.html', emprunt=emprunt_to_update)
     else:
+        return "Emprunt non trouvé", 404'''
+
+@app.route('/emprunts/<id>/update', methods=['GET'])
+def show_update_emprunt_form(id):
+    emprunt_to_update = emprunt.get_emprunt_by_id(id, mongo)
+    if emprunt_to_update:
+        abonnes = mongo.db.abonnes.find()
+        documents = mongo.db.documents.find()
+        date_retour_prevu = emprunt_to_update['date_retour_prevu'].strftime('%Y-%m-%d') if 'date_retour_prevu' in emprunt_to_update else ''
+        
+        return render_template('emprunts/modifier.html', 
+                               emprunt=emprunt_to_update,
+                               abonnes=abonnes,
+                               documents=documents,
+                               date_retour_prevu=date_retour_prevu)
+    else:
         return "Emprunt non trouvé", 404
+
+@app.route('/emprunts/<id>/update', methods=['POST'])
+def update_emprunt(id):
+    # Récupérer les données du formulaire
+    abonne_id = request.form['abonne_id']
+    document_id = request.form['document_id']
+    date_retour_prevu = request.form['date_retour_prevu']
+
+    # Vérifier si la date de retour prévue est dans le passé
+    statut = "emprunté"
+    if datetime.now().date() >= datetime.strptime(date_retour_prevu, '%Y-%m-%d').date():
+        statut = "retourné"
+    
+    # Mettre à jour l'emprunt dans la base de données
+    updated_emprunt = {
+        "abonne_id": abonne_id,
+        "document_id": document_id,
+        "date_emprunt": datetime.now(),
+        "date_retour_prevu": date_retour_prevu,
+        "statut": statut,
+    }
+    
+    mongo.db.emprunts.update_one({"_id": ObjectId(id)}, {"$set": updated_emprunt})
+
+    return redirect(url_for('show_update_emprunt_form', id=id))  # Rediriger vers la page de l'emprunt mis à jour
 
 
 @app.route('/add_emprunt', methods=['GET'])
