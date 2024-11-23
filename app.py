@@ -10,7 +10,7 @@ from datetime import datetime
 from bson import ObjectId
 from flask import request, redirect, render_template, jsonify
 
-app = Flask(__name__)  # Corrigé name en _name_
+app = Flask(__name__)  
 app.config.from_object(Config)
 
 mongo = PyMongo(app)
@@ -253,14 +253,7 @@ def show_emprunt_details(id):
     else:
         return "Emprunt non trouvé", 404
 
-# Route pour afficher la page de modification
-'''@app.route('/emprunts/<id>/update', methods=['GET'])
-def show_update_emprunt_form(id):
-    emprunt_to_update = emprunt.get_emprunt_by_id(id, mongo)
-    if emprunt_to_update:
-        return render_template('emprunts/modifier.html', emprunt=emprunt_to_update)
-    else:
-        return "Emprunt non trouvé", 404'''
+
 
 @app.route('/emprunts/<id>/update', methods=['GET'])
 def show_update_emprunt_form(id):
@@ -278,30 +271,7 @@ def show_update_emprunt_form(id):
     else:
         return "Emprunt non trouvé", 404
 
-@app.route('/emprunts/<id>/update', methods=['POST'])
-def update_emprunt(id):
-    # Récupérer les données du formulaire
-    abonne_id = request.form['abonne_id']
-    document_id = request.form['document_id']
-    date_retour_prevu = request.form['date_retour_prevu']
 
-    # Vérifier si la date de retour prévue est dans le passé
-    statut = "emprunté"
-    if datetime.now().date() >= datetime.strptime(date_retour_prevu, '%Y-%m-%d').date():
-        statut = "retourné"
-    
-    # Mettre à jour l'emprunt dans la base de données
-    updated_emprunt = {
-        "abonne_id": abonne_id,
-        "document_id": document_id,
-        "date_emprunt": datetime.now(),
-        "date_retour_prevu": date_retour_prevu,
-        "statut": statut,
-    }
-    
-    mongo.db.emprunts.update_one({"_id": ObjectId(id)}, {"$set": updated_emprunt})
-
-    return redirect(url_for('show_update_emprunt_form', id=id))  # Rediriger vers la page de l'emprunt mis à jour
 
 
 @app.route('/add_emprunt', methods=['GET'])
@@ -320,35 +290,7 @@ def show_add_emprunt_form():
     return render_template('emprunts/ajouter.html', abonnes=abonnes, documents=documents_disponibles, current_date=current_date)
 
 
-'''@app.route('/add_emprunt', methods=['POST'])
-def add_emprunt_route():
-    # Retrieve form data from the request
-    abonne_id = request.form['abonne_id']
-    document_id = request.form['document_id']
-    date_emprunt = datetime.now()
-    date_retour_prevu = request.form['date_retour_prevu']
-    
-    # Convert the planned return date to a datetime object
-    date_retour_prevu = datetime.strptime(date_retour_prevu, '%Y-%m-%d')
 
-    # Check if the planned return date is before the borrowing date
-    if date_retour_prevu < date_emprunt:
-        return "La date de retour ne peut pas être antérieure à la date d'emprunt", 400
-    
-    # Prepare the data for the new loan (emprunt)
-    data = {
-        'abonne_id': abonne_id,
-        'document_id': document_id,
-        'date_emprunt': date_emprunt,
-        'date_retour_prevu': date_retour_prevu,
-        'statut': 'emprunté'
-    }
-    
-    # Add the loan to the database using the helper function
-    result = emprunt.add_emprunt(data, mongo)
-    
-    # Redirect to the list of emprunts after adding the new loan
-    return redirect('/emprunts')'''
 
 @app.route('/add_emprunt', methods=['POST'])
 def add_emprunt_route():
