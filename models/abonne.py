@@ -30,6 +30,10 @@ def get_abonne_by_id(id, mongo):
         return abonne
     return None
 
+
+
+
+
 # DELETE - Supprimer un document
 def delete_abonne(id, mongo):
     result = mongo.db.abonnes.delete_one({"_id": ObjectId(id)})
@@ -68,3 +72,15 @@ def get_abonnes(mongo):
         abonne['_id'] = str(abonne['_id'])  # Convertir l'ObjectId en string
         result.append(abonne)
     return result
+
+
+
+
+
+# Ajouter les champs "emprunts_en_cours" et "historique_emprunts" pour tous les abonnés existants
+def update_abonnes_structure(mongo):
+    mongo.db.abonnes.update_many(
+        {},
+        {"$set": {"emprunts_en_cours": [], "historique_emprunts": []}}
+    )
+    return {"message": "Les champs emprunts_en_cours et historique_emprunts ont été ajoutés aux abonnés."}

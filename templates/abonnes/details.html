@@ -1,11 +1,9 @@
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détails du ABonné</title>
+    <title>Détails du Abonné</title>
     <!-- Inclure Bootstrap ou autres styles si nécessaire -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
@@ -15,17 +13,45 @@
     <h1>Détails du Abonné</h1>
     <div class="card">
         <div class="card-body">
-            
-           
             <p><strong>Nom :</strong> {{ abonne.nom }}</p>
-            <p><strong>Prenom :</strong> {{ abonne.prenom }}</p>
+            <p><strong>Prénom :</strong> {{ abonne.prenom }}</p>
             <p><strong>Adresse :</strong> {{ abonne.adresse }}</p>
-            <p><strong>Date de inscription:</strong> {{ abonne.date_inscription }}</p>
+            <p><strong>Date d'inscription :</strong> {{ abonne.date_inscription }}</p>
             
+            <!-- Afficher les emprunts en cours -->
+            <h5 class="mt-4">Emprunts en cours :</h5>
+            {% if abonne.emprunts %}
+                <ul>
+                    {% for emprunt in abonne.emprunts %}
+                        <li>
+                            <strong>Titre :</strong> {{ emprunt.titre }}<br>
+                            <strong>Date d'emprunt :</strong> {{ emprunt.date_emprunt }}<br>
+                            <strong>Date de retour prévue :</strong> {{ emprunt.date_retour_prevu }}<br>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Aucun emprunt en cours.</p>
+            {% endif %}
+
+            <!-- Afficher l'historique des emprunts -->
+            <h5 class="mt-4">Historique des Emprunts :</h5>
+            {% if abonne.historique_emprunts %}
+                <ul>
+                    {% for emprunt in abonne.historique_emprunts %}
+                        <li>
+                            <strong>Titre :</strong> {{ emprunt.titre }}<br>
+                            <strong>Date d'emprunt :</strong> {{ emprunt.date_emprunt }}<br>
+                            <strong>Date de retour :</strong> {{ emprunt.date_retour }}<br>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Aucun emprunt historique.</p>
+            {% endif %}
         </div>
     </div>
 
-    
     <a href="/abonnes" class="btn btn-secondary mt-3">Retour à la Liste</a>
 </div>
 
