@@ -20,16 +20,16 @@ mongo = PyMongo(app)
 
 @app.route('/')
 def home():
-    # Récupérer tous les emprunts
-    emprunts = emprunt.get_emprunts(mongo) 
-    
-    # Récupérer tous les abonnés et documents pour les lier aux emprunts
+    # Fetch all loans (emprunts)
+    emprunts = emprunt.get_emprunts(mongo)
+
+    # Fetch all subscribers (abonnes) and documents to link to the loans
     abonnes = {str(abonne['_id']): abonne for abonne in mongo.db.abonnes.find()}
     documents = {str(document['_id']): document for document in mongo.db.documents.find()}
     genres = {str(genre['_id']): genre for genre in mongo.db.genres.find()}
-    
-    # Passer les emprunts et les informations supplémentaires au template
-    return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents,genres=genres)
+
+    # Pass loans and additional information to the template
+    return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents, genres=genres)
 
 
 
@@ -235,32 +235,41 @@ def delete_document_route(id):
 
 
 
+
+
+
+
 @app.route('/emprunts', methods=['GET'])
 def emprunts_lister():
-    emprunts = emprunt.get_emprunts(mongo)  # Récupère tous les documents
+    # Fetch all loans and pass them to the template
+    emprunts = emprunt.get_emprunts(mongo)
     return render_template('emprunts/lister.html', emprunts=emprunts)
 
 
-
-
-
-# Route pour récupérer un abonné par ID
 @app.route('/emprunts/<id>/', methods=['GET'])
 def show_emprunt_details(id):
     em = emprunt.get_emprunt_by_id(id, mongo)
     if em:
-        return render_template('emprunts/details.html', emprunt=em)
+        # Récupérer l'abonné et le document liés à cet emprunt
+        abonne = mongo.db.abonnes.find_one({'_id': em['abonne_id']})
+        document = mongo.db.documents.find_one({'_id': em['document_id']})
+        # Passer les données complètes à la template
+        return render_template('emprunts/details.html', emprunt=em, abonne=abonne, document=document)
     else:
         return "Emprunt non trouvé", 404
 
 
 
+
 @app.route('/emprunts/<id>/update', methods=['GET'])
 def show_update_emprunt_form(id):
+    # Récupérer l'emprunt à mettre à jour par ID
     emprunt_to_update = emprunt.get_emprunt_by_id(id, mongo)
     if emprunt_to_update:
         abonnes = mongo.db.abonnes.find()
         documents = mongo.db.documents.find()
+        
+        # Si date_retour_prevu existe, la formater correctement
         date_retour_prevu = emprunt_to_update['date_retour_prevu'].strftime('%Y-%m-%d') if 'date_retour_prevu' in emprunt_to_update else ''
         
         return render_template('emprunts/modifier.html', 
@@ -270,44 +279,60 @@ def show_update_emprunt_form(id):
                                date_retour_prevu=date_retour_prevu)
     else:
         return "Emprunt non trouvé", 404
-
-
-
+@app.route('/emprunts/<id>/update', methods=['POST'])
+def update_emprunt(id):
+    # Récupérer l'emprunt à mettre à jour par ID
+    emprunt_to_update = emprunt.get_emprunt_by_id(id, mongo)
+    
+    if emprunt_to_update:
+        # Récupérer les données du formulaire soumis
+        date_retour_prevu = request.form.get('date_retour_prevu')  # Nouvelle date de retour
+        abonne_id = request.form.get('abonne_id')  # ID de l'abonné
+        document_id = request.form.get('document_id')  # ID du document
+        
+        # Mettre à jour l'emprunt avec les nouvelles données
+        updated_data = {
+            'date_retour_prevu': datetime.strptime(date_retour_prevu, '%Y-%m-%d') if date_retour_prevu else None,
+            'abonne_id': ObjectId(abonne_id) if abonne_id else None,  # Mise à jour de l'abonné
+            'document_id': ObjectId(document_id) if document_id else None,  # Mise à jour du document
+        }
+        
+        # Mettre à jour l'emprunt dans la base de données
+        mongo.db.emprunts.update_one({'_id': ObjectId(id)}, {'$set': updated_data})
+        
+        return redirect('/emprunts')  # Rediriger vers la liste des emprunts
+    else:
+        return "Emprunt non trouvé", 404
 
 @app.route('/add_emprunt', methods=['GET'])
 def show_add_emprunt_form():
-    # Fetch all abonnes (members) and documents with "Disponible" status
+    # Fetch all subscribers and available documents
     abonnes = list(mongo.db.abonnes.find())
     documents_disponibles = list(mongo.db.documents.find({"disponibilite": "Disponible"}))
-    
-    # Debugging: Print the fetched documents to check if they exist
-    print("Documents disponibles:", documents_disponibles)
-    
-    # Get the current date in the format needed for the input field
+
+    # Get the current date
     current_date = datetime.now().strftime('%Y-%m-%d')
-    
-    # Render the form with available abonnes and documents
+
+    # Render the form with available subscribers and documents
     return render_template('emprunts/ajouter.html', abonnes=abonnes, documents=documents_disponibles, current_date=current_date)
-
-
 
 
 @app.route('/add_emprunt', methods=['POST'])
 def add_emprunt_route():
-    # Retrieve form data from the request
+    # Retrieve form data
     abonne_id = request.form['abonne_id']
     document_id = request.form['document_id']
     date_emprunt = datetime.now()
     date_retour_prevu = request.form['date_retour_prevu']
-    
+
     # Convert the planned return date to a datetime object
     date_retour_prevu = datetime.strptime(date_retour_prevu, '%Y-%m-%d')
 
     # Check if the planned return date is before the borrowing date
     if date_retour_prevu < date_emprunt:
         return "La date de retour ne peut pas être antérieure à la date d'emprunt", 400
-    
-    # Prepare the data for the new loan (emprunt)
+
+    # Prepare the data for the new loan
     data = {
         'abonne_id': abonne_id,
         'document_id': document_id,
@@ -315,15 +340,12 @@ def add_emprunt_route():
         'date_retour_prevu': date_retour_prevu,
         'statut': 'emprunté'
     }
-    
-    # Add the loan to the database using the helper function
+
+    # Add the loan to the database
     result = emprunt.add_emprunt(data, mongo)
-    
-    # Redirect to the list of emprunts after adding the new loan
+
+    # Redirect to the list of loans after adding the new loan
     return redirect('/emprunts')
-
-
-
 
 
 # Route pour supprimer un abonné
