@@ -10,13 +10,13 @@ nav {
 }
 
 nav a {
-    color: #ffffff;  /* Liens en blanc */
+    color: #1c5cd4;  /* Liens en blanc */
     font-size: 16px;
     font-weight: 600;
 }
 
 nav a:hover {
-    color: #f8f9fa;
+    color: #0a4681;
     text-decoration: underline;
 }
 

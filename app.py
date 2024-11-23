@@ -319,33 +319,47 @@ def show_add_emprunt_form():
 
 @app.route('/add_emprunt', methods=['POST'])
 def add_emprunt_route():
-    # Retrieve form data
-    abonne_id = request.form['abonne_id']
-    document_id = request.form['document_id']
-    date_emprunt = datetime.now()
-    date_retour_prevu = request.form['date_retour_prevu']
+    try:
+        # Récupérer les données envoyées par la requête JSON
+        abonne_id = request.json.get('abonne_id')
+        document_id = request.json.get('document_id')
+        date_emprunt = datetime.now()
+        date_retour_prevu = request.json.get('date_retour_prevu')
 
-    # Convert the planned return date to a datetime object
-    date_retour_prevu = datetime.strptime(date_retour_prevu, '%Y-%m-%d')
+        # Convertir la date de retour prévue
+        date_retour_prevu = datetime.strptime(date_retour_prevu, '%Y-%m-%d')
 
-    # Check if the planned return date is before the borrowing date
-    if date_retour_prevu < date_emprunt:
-        return "La date de retour ne peut pas être antérieure à la date d'emprunt", 400
+        # Vérification de la date
+        if date_retour_prevu < date_emprunt:
+            return jsonify({
+                'error': "La date de retour prévue ne peut pas être antérieure à la date d'emprunt."
+            }), 400
 
-    # Prepare the data for the new loan
-    data = {
-        'abonne_id': abonne_id,
-        'document_id': document_id,
-        'date_emprunt': date_emprunt,
-        'date_retour_prevu': date_retour_prevu,
-        'statut': 'emprunté'
-    }
+        # Préparation des données pour la base
+        data = {
+            'abonne_id': abonne_id,
+            'document_id': document_id,
+            'date_emprunt': date_emprunt,
+            'date_retour_prevu': date_retour_prevu,
+            'statut': 'emprunté'
+        }
 
-    # Add the loan to the database
-    result = emprunt.add_emprunt(data, mongo)
+        # Ajouter à la base de données
+        result = emprunt.add_emprunt(data, mongo)
 
-    # Redirect to the list of loans after adding the new loan
+        # Retourner un succès en JSON
+        return jsonify({'message': "Emprunt ajouté avec succès"}), 200
+
+    except Exception as e:
+        # Retourner une erreur générique
+        return jsonify({'error': f"Erreur interne : {str(e)}"}), 500
+
+
+    except Exception as e:
+        return jsonify({'error': f"Erreur interne : {str(e)}"}), 500
+    
     return redirect('/emprunts')
+
 
 
 # Route pour supprimer un abonné

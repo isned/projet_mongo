@@ -52,6 +52,8 @@
             <input type="date" class="form-control" id="date_retour_prevu" name="date_retour_prevu" required>
         </div>
 
+       
+
         
 
         <button type="submit" class="btn btn-primary">Ajouter</button>
@@ -62,8 +64,47 @@
 </body>
 </html>
 
-
-
+<script>
+    document.querySelector("form").addEventListener("submit", function (event) {
+        event.preventDefault(); // Empêche le rechargement de la page
+    
+        // Récupérer les valeurs des champs
+        const abonneId = document.getElementById("abonne_id").value;
+        const documentId = document.getElementById("document_id").value;
+        const dateRetourPrevu = document.getElementById("date_retour_prevu").value;
+    
+        // Envoyer une requête POST au backend
+        fetch('/add_emprunt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                abonne_id: abonneId,
+                document_id: documentId,
+                date_retour_prevu: dateRetourPrevu,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    // Affiche uniquement le popup pour une erreur liée à la date
+                    if (data.error.includes("date de retour")) {
+                        alert("Erreur : " + data.error);
+                    }
+                } else {
+                    // Succès
+                    alert("Succès : " + data.message);
+                    // Réinitialiser le formulaire après succès
+                    document.querySelector("form").reset();
+                    // Optionnel : rediriger après succès
+                    window.location.href = '/emprunts';
+                }
+            })
+            .catch(error => console.error('Erreur:', error));
+    });
+    </script>
+    
 
 
 
