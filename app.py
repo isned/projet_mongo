@@ -100,7 +100,23 @@ def add_abonne_route():
 
 
 
+'''@app.route('/abonnes/<abonne_id>/historique', methods=['GET'])
+def afficher_historique(abonne_id):
+    historique = emprunt.get_historique_emprunts(abonne_id, mongo)
+    return render_template('abonnes/historique.html', historique=historique)'''
 
+@app.route('/abonnes/<id>/historique')
+def afficher_historique(id):
+    # Vérifier si l'abonné existe dans la base de données
+    abonne = mongo.db.abonnes.find_one({"_id": ObjectId(id)})
+    if not abonne:
+        return "Abonné non trouvé", 404
+    
+    # Récupérer l'historique des emprunts pour cet abonné
+    historique = emprunt.get_historique_emprunts(id, mongo)
+    
+    # Passer les données à la vue HTML
+    return render_template('abonnes/historique.html', abonne=abonne, historique=historique)
 
 
 

@@ -126,3 +126,53 @@ def update_emprunt(id, data, mongo):
 
     mongo.db.emprunts.update_one({"_id": ObjectId(id)}, {"$set": updated_emprunt})
     return {"message": "Emprunt mis à jour avec succès!"}
+
+
+
+def get_historique_emprunts(abonne_id, mongo):
+    # Utilisez find() pour récupérer tous les emprunts associés à l'abonné
+    emprunts = mongo.db.emprunts.find({"abonne_id": abonne_id})
+    
+    result = []
+
+    for emprunt in emprunts:
+        # Ajouter les détails du document
+        document = mongo.db.documents.find_one({"_id": ObjectId(emprunt['document_id'])})
+        if document:
+            document['_id'] = str(document['_id'])
+            emprunt['document'] = document
+        
+        # Convertir ObjectId et ajouter à la liste
+        emprunt['_id'] = str(emprunt['_id'])
+        result.append(emprunt)
+
+    return result
+
+
+'''def get_historique_emprunts(abonne_id, mongo):
+    # Récupérer tous les emprunts associés à un abonné spécifique
+    emprunts = mongo.db.emprunts.find({"abonne_id": abonne_id})
+    result = []
+
+    for emprunt in emprunts:
+        # Ajouter les détails du document associé à chaque emprunt
+        document = mongo.db.documents.find_one({"_id": ObjectId(emprunt['document_id'])})
+        if document:
+            document['_id'] = str(document['_id'])
+            emprunt['document'] = document
+        
+        # Convertir l'ObjectId de l'emprunt
+        emprunt['_id'] = str(emprunt['_id'])
+
+        # Calculer le statut en fonction de la date de retour
+        if emprunt.get('date_retour_effectif'):
+            emprunt['statut'] = 'Terminé'  # Emprunt terminé (retour effectué)
+        elif emprunt.get('date_retour_prevu') and emprunt['date_retour_prevu'] < datetime.now():
+            emprunt['statut'] = 'En retard'  # Emprunt en retard (date de retour dépassée)
+        else:
+            emprunt['statut'] = 'En cours'  # Emprunt en cours (pas encore retourné)
+
+        # Ajouter l'emprunt à la liste des résultats
+        result.append(emprunt)
+
+    return result'''

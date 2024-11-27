@@ -84,3 +84,12 @@ def update_abonnes_structure(mongo):
         {"$set": {"emprunts_en_cours": [], "historique_emprunts": []}}
     )
     return {"message": "Les champs emprunts_en_cours et historique_emprunts ont été ajoutés aux abonnés."}
+
+
+
+
+
+
+
+
+

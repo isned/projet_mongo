@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique des emprunts</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h1>Historique des emprunts de {{ abonne.nom }} {{ abonne.prenom }}</h1>
+    
+    {% if historique %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Document</th>
+                <th>Date d'emprunt</th>
+                <th>Date de retour prévue</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emprunt in historique %}
+            <tr>
+                <td>{{ emprunt.document.titre }}</td>
+                <td>{{ emprunt.date_emprunt.strftime('%d/%m/%Y') }}</td>
+                <td>{{ emprunt.date_retour_prevu.strftime('%d/%m/%Y') if emprunt.date_retour_prevu else "Non défini" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Aucun emprunt trouvé pour cet abonné.</p>
+    {% endif %}
+
+    <!-- Boutons pour imprimer et exporter en CSV -->
+    <a href="#" id="exportCsv" class="btn btn-success mt-3">Exporter en CSV</a>
+    <a href="#" onclick="window.print();" class="btn btn-info mt-3">Imprimer</a>
+    
+    <a href="/abonnes" class="btn btn-primary mt-3">Retour</a>
+</div>
+
+<script>
+    // Fonction d'exportation CSV
+    document.getElementById("exportCsv").addEventListener("click", function() {
+        var table = document.querySelector("table");
+        var rows = table.querySelectorAll("tr");
+        var csvContent = "";
+
+        rows.forEach(function(row) {
+            var cols = row.querySelectorAll("td, th");
+            var rowData = [];
+            cols.forEach(function(col) {
+                rowData.push(col.textContent);
+            });
+            csvContent += rowData.join(",") + "\n";
+        });
+
+        // Créer un lien de téléchargement
+        var link = document.createElement("a");
+        link.href = "data:text/csv;charset=utf-8," + encodeURI(csvContent);
+        link.target = "_blank";
+        link.download = "historique_emprunts.csv";
+        link.click();
+    });
+</script>
+</body>
+</html>
