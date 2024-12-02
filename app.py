@@ -16,23 +16,6 @@ from flask import request, redirect, render_template, jsonify
 
 from models.user import User
 
-
-
-
-
-'''@app.route('/')
-def home():
-    # Fetch all loans (emprunts)
-    emprunts = emprunt.get_emprunts(mongo)
-
-    # Fetch all subscribers (abonnes) and documents to link to the loans
-    abonnes = {str(abonne['_id']): abonne for abonne in mongo.db.abonnes.find()}
-    documents = {str(document['_id']): document for document in mongo.db.documents.find()}
-    genres = {str(genre['_id']): genre for genre in mongo.db.genres.find()}
-
-    # Pass loans and additional information to the template
-    return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents, genres=genres)'''
-
 app = Flask(__name__)  
 app.config.from_object(Config)
 # Ensure cookies are set correctly for third-party contexts
@@ -54,7 +37,11 @@ def home():
 
     return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents, genres=genres)
 
-
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    flash('Vous avez été déconnecté.', 'info')
+    return redirect(url_for('login'))
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -100,6 +87,7 @@ def register():
         return redirect(url_for('login'))  # Redirige vers la page de connexion
 
     return render_template('users/register.html')
+
 
 
 # Route pour lister les abonnés
