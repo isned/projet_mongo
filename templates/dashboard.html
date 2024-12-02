@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Bibliothèque</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="/abonnes">Abonnés</a></li>
+                <li class="nav-item"><a class="nav-link" href="/documents">Documents</a></li>
+                <li class="nav-item"><a class="nav-link" href="/emprunts">Emprunts</a></li>
+                <li class="nav-item"><a class="nav-link" href="/genres">Genre</a></li>
+                <li class="nav-item"><a class="nav-link" href="/dashboard">Tableau de Bord</a></li>
+                <li class="nav-item">
+                    <form action="/logout" method="POST" style="display: inline;">
+                        <button class="btn btn-danger btn-sm nav-link text-white" style="border: none;">Déconnexion</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <div class="container mt-5">
+        <h2>Tableau de Bord</h2>
+        <div class="row">
+            <!-- Statistiques -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">Nombre d'Abonnés</div>
+                    <div class="card-body">
+                        <h3>{{ total_abonnes }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">Nombre de Documents</div>
+                    <div class="card-body">
+                        <h3>{{ total_documents }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">Nombre de genres</div>
+                    <div class="card-body">
+                        <h3>{{ total_genres}}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphiques -->
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <canvas id="empruntsChart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="abonneDocumentsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts JS de Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Script pour initialiser les graphiques -->
+    <script>
+        // Graphique des emprunts
+        var ctx1 = document.getElementById('empruntsChart').getContext('2d');
+        var empruntsChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Emprunts'],
+                datasets: [{
+                    label: 'Nombre d\'Emprunts',
+                    data: [{{ total_emprunts|tojson }}],  // Utilisation de tojson pour sécuriser l'injection
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    
+        // Graphique des abonnés et documents
+        var ctx2 = document.getElementById('abonneDocumentsChart').getContext('2d');
+        var abonneDocumentsChart = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: ['Abonnés', 'Documents'],
+                datasets: [{
+                    label: 'Statistiques',
+                    data: [{{ total_abonnes|tojson }}, {{ total_documents|tojson }}],  // Utilisation de tojson
+                    backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+    
+</body>
+</html>

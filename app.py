@@ -526,48 +526,25 @@ def add_genre_route():
 
 
 
-# Route d'inscription (register)
-'''@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        data = request.form
-        email = data.get('email')
-        password = data.get('password')
+@app.route('/dashboard')
+def dashboard():
+    emprunts = emprunt.get_emprunts(mongo)
+    total_emprunts = len(emprunts)
+    total_abonnes = mongo.db.abonnes.count_documents({})
+    total_documents = mongo.db.documents.count_documents({})
+    
+    # Corrected counting of genres
+    total_genres = mongo.db.genres.count_documents({})  # Count the number of genres in the 'genres' collection
 
-        if not email or not password:
-            return jsonify({'message': 'Email et mot de passe sont requis!'}), 400
+    # Pass the data to the template
+    return render_template('dashboard.html', 
+                           emprunts=emprunts,
+                           total_emprunts=total_emprunts,
+                           total_abonnes=total_abonnes,
+                           total_documents=total_documents,
+                           total_genres=total_genres)
 
-        # Vérifier si l'utilisateur existe déjà
-        if User.find_by_email(email, mongo.db.users):
-            return jsonify({'message': 'Cet email est déjà enregistré!'}), 409
 
-        # Créer un utilisateur et l'enregistrer
-        new_user = User(email, password)
-        new_user.save_to_db(mongo.db.users)
-        return redirect(url_for('login'))
-
-    return render_template('users/register.html')
-
-# Route de connexion (login)
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        data = request.form
-        email = data.get('email')
-        password = data.get('password')
-
-        if not email or not password:
-            return jsonify({'message': 'Email et mot de passe sont requis!'}), 400
-
-        # Recherche de l'utilisateur
-        user = User.find_by_email(email, mongo.db.users)
-        if not user or not user.check_password(password):
-            return jsonify({'message': 'Email ou mot de passe incorrect!'}), 401
-
-        return redirect(url_for('dashboard'))  # Redirection vers un tableau de bord après la connexion réussie
-
-    return render_template('users/login.html')'''
-
-if __name__ == '__main__':  # Corrigé name en _name_
+if __name__== '__main__':
     print("Démarrage de l'application Flask sur le port 5000")
     app.run(debug=True, port=5000)
