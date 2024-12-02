@@ -532,17 +532,22 @@ def dashboard():
     total_emprunts = len(emprunts)
     total_abonnes = mongo.db.abonnes.count_documents({})
     total_documents = mongo.db.documents.count_documents({})
-    
-    # Corrected counting of genres
-    total_genres = mongo.db.genres.count_documents({})  # Count the number of genres in the 'genres' collection
+    total_genres = mongo.db.genres.count_documents({})
 
-    # Pass the data to the template
+    # Calcul de la disponibilité des documents
+    documents_disponibles = mongo.db.documents.count_documents({'disponibilite': 'Disponible'})
+    documents_non_disponibles = mongo.db.documents.count_documents({'disponibilite': 'Indisponible'})
+
+    # Passer les données au template
     return render_template('dashboard.html', 
                            emprunts=emprunts,
                            total_emprunts=total_emprunts,
                            total_abonnes=total_abonnes,
                            total_documents=total_documents,
-                           total_genres=total_genres)
+                           total_genres=total_genres,
+                           documents_disponibles=documents_disponibles,
+                           documents_non_disponibles=documents_non_disponibles)
+
 
 
 if __name__== '__main__':
