@@ -1,24 +1,26 @@
-from flask import Flask, redirect, render_template, request, jsonify, url_for
+from flask import Flask, flash, redirect, render_template, request, jsonify, session, url_for
+from flask_cors import CORS
+from flask_login import LoginManager, current_user, login_user, logout_user
 from flask_pymongo import PyMongo
 from config import Config
-from models import abonne, genre
+from models import abonne, genre,user
 from models import document
 from models import emprunt
 from datetime import datetime
+from flask_bcrypt import Bcrypt
+from flask_login import login_required
 
 from datetime import datetime
 from bson import ObjectId
 from flask import request, redirect, render_template, jsonify
 
-app = Flask(__name__)  
-app.config.from_object(Config)
-
-mongo = PyMongo(app)
+from models.user import User
 
 
 
 
-@app.route('/')
+
+'''@app.route('/')
 def home():
     # Fetch all loans (emprunts)
     emprunts = emprunt.get_emprunts(mongo)
@@ -29,9 +31,75 @@ def home():
     genres = {str(genre['_id']): genre for genre in mongo.db.genres.find()}
 
     # Pass loans and additional information to the template
+    return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents, genres=genres)'''
+
+app = Flask(__name__)  
+app.config.from_object(Config)
+# Ensure cookies are set correctly for third-party contexts
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Allow third-party cookies
+app.config['SESSION_COOKIE_SECURE'] = False  # For development (should be True in production with HTTPS)
+app.config['SECRET_KEY'] = 'your_secret_key_here'
+
+mongo = PyMongo(app)
+CORS(app) 
+
+
+@app.route('/')
+def home():
+    emprunts = emprunt.get_emprunts(mongo)
+
+    abonnes = {str(abonne['_id']): abonne for abonne in mongo.db.abonnes.find()}
+    documents = {str(document['_id']): document for document in mongo.db.documents.find()}
+    genres = {str(genre['_id']): genre for genre in mongo.db.genres.find()}
+
     return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents, genres=genres)
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        data = request.form
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password:
+            return jsonify({'message': 'Email et mot de passe sont requis!'}), 400
+
+        user = User.find_by_email(email, mongo.db.users)
+        if not user:
+            return jsonify({'message': 'Email ou mot de passe incorrect!'}), 401
+
+        password_matches = user.check_password(password)
+        if not password_matches:
+            return jsonify({'message': 'Email ou mot de passe incorrect!'}), 401
+
+        # Redirection après connexion réussie
+        print(f"Connexion réussie pour l'utilisateur : {email}")
+        return redirect(url_for('home'))  # Redirige vers la page principale
+
+    return render_template('users/login.html')
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        data = request.form
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password:
+            return jsonify({'message': 'Email et mot de passe sont requis!'}), 400
+
+        if User.find_by_email(email, mongo.db.users):
+            return jsonify({'message': 'Cet email est déjà enregistré!'}), 409
+
+        # Création d'un nouvel utilisateur
+        new_user = User(email, password)
+        new_user.save_to_db(mongo.db.users)
+        print(f"Nouvel utilisateur créé : {email}")
+        return redirect(url_for('login'))  # Redirige vers la page de connexion
+
+    return render_template('users/register.html')
 
 
 # Route pour lister les abonnés
@@ -469,6 +537,48 @@ def add_genre_route():
 
 
 
+
+# Route d'inscription (register)
+'''@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        data = request.form
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password:
+            return jsonify({'message': 'Email et mot de passe sont requis!'}), 400
+
+        # Vérifier si l'utilisateur existe déjà
+        if User.find_by_email(email, mongo.db.users):
+            return jsonify({'message': 'Cet email est déjà enregistré!'}), 409
+
+        # Créer un utilisateur et l'enregistrer
+        new_user = User(email, password)
+        new_user.save_to_db(mongo.db.users)
+        return redirect(url_for('login'))
+
+    return render_template('users/register.html')
+
+# Route de connexion (login)
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        data = request.form
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password:
+            return jsonify({'message': 'Email et mot de passe sont requis!'}), 400
+
+        # Recherche de l'utilisateur
+        user = User.find_by_email(email, mongo.db.users)
+        if not user or not user.check_password(password):
+            return jsonify({'message': 'Email ou mot de passe incorrect!'}), 401
+
+        return redirect(url_for('dashboard'))  # Redirection vers un tableau de bord après la connexion réussie
+
+    return render_template('users/login.html')'''
 
 if __name__ == '__main__':  # Corrigé name en _name_
     print("Démarrage de l'application Flask sur le port 5000")
