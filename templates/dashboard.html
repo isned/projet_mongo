@@ -12,7 +12,7 @@
         .chart-container {
             position: relative;
             width: 100%;
-            height: 250px; /* Hauteur réduite des graphiques */
+            height: 300px; /* Hauteur des graphiques ajustée */
             margin-bottom: 20px;
         }
         
@@ -33,23 +33,14 @@
 
         /* Espacement entre les cartes */
         .card {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Amélioration de la navbar */
-        .navbar {
-            margin-bottom: 30px;
-        }
-
-        .navbar-brand {
-            font-size: 1.5rem;
-        }
-
         /* Espacement et centrage du contenu principal */
         .container {
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         /* Amélioration des boutons */
@@ -61,13 +52,20 @@
         .btn-danger:hover {
             background-color: #c82333;
         }
+
+        /* Espacement des graphiques sur les petits écrans */
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px; /* Réduction de la hauteur des graphiques sur les petits écrans */
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <a class="navbar-brand" href="#">Bibliothèque</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">

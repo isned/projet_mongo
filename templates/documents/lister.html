@@ -8,53 +8,74 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Bibliothèque</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="/abonnes">Abonnés</a></li>
+                <li class="nav-item"><a class="nav-link" href="/documents">Documents</a></li>
+                <li class="nav-item"><a class="nav-link" href="/emprunts">Emprunts</a></li>
+                <li class="nav-item"><a class="nav-link" href="/genres">Genre</a></li>
+                <li class="nav-item"><a class="nav-link" href="/dashboard">Tableau de Bord</a></li>
+                <li class="nav-item">
+                    <form action="/logout" method="POST" style="display: inline;">
+                        <button class="btn btn-danger btn-sm nav-link text-white" style="border: none;">Déconnexion</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-<div class="container mt-4">
-    <h1>Liste des Documents</h1>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Titre</th>
-                <th>Auteur</th>
-                <th>Genre</th>
-                <th>Date de Publication</th>
-                <th>Disponibilité</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for doc in documents %}
-            <tr>
-                <td>{{ doc.titre }}</td>
-                <td>{{ doc.auteur }}</td>
-                <td>{{ doc.genre }}</td>
-                <td>{{ doc.date_publication }}</td>
-                <td>{{ doc.disponibilite }}</td>
-                <td>
-                    <a href="/documents/{{ doc._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
-                    <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ doc._id }}')">Supprimer</a>
-                    <a href="/documents/{{ doc._id }}/" class="btn btn-info btn-sm">Détails</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Contenu Principal -->
+    <div class="container mt-4">
+        <h1>Liste des Documents</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Auteur</th>
+                    <th>Genre</th>
+                    <th>Date de Publication</th>
+                    <th>Disponibilité</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documents %}
+                <tr>
+                    <td>{{ doc.titre }}</td>
+                    <td>{{ doc.auteur }}</td>
+                    <td>{{ doc.genre }}</td>
+                    <td>{{ doc.date_publication }}</td>
+                    <td>{{ doc.disponibilite }}</td>
+                    <td>
+                        <a href="/documents/{{ doc._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
+                        <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ doc._id }}')">Supprimer</a>
+                        <a href="/documents/{{ doc._id }}/" class="btn btn-info btn-sm">Détails</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    <a href="/add_document" class="btn btn-primary mt-3">Ajouter un Document</a>
-    <a href="/" class="btn btn-primary mt-3">Retour</a>
-</div>
+        <a href="/add_document" class="btn btn-primary mt-3">Ajouter un Document</a>
+        <a href="/" class="btn btn-primary mt-3">Retour</a>
+    </div>
 
-<!-- Ajout d'un script JavaScript pour la confirmation -->
-<script>
-    function confirmDelete(id) {
-        // Demander à l'utilisateur de confirmer la suppression
-        var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer ce document ?");
-        if (confirmAction) {
-            // Si l'utilisateur confirme, rediriger vers la route de suppression
-            window.location.href = '/documents/' + id + '/delete';
+    <!-- Ajout d'un script JavaScript pour la confirmation -->
+    <script>
+        function confirmDelete(id) {
+            // Demander à l'utilisateur de confirmer la suppression
+            var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer ce document ?");
+            if (confirmAction) {
+                // Si l'utilisateur confirme, rediriger vers la route de suppression
+                window.location.href = '/documents/' + id + '/delete';
+            }
         }
-    }
-</script>
-
+    </script>
 </body>
 </html>

@@ -9,44 +9,69 @@
 </head>
 <body>
 
-<div class="container mt-4">
-    <h1>Liste des Genres</h1>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Genre</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for g in genres %}
-            <tr>
-                <td>{{ g.genre_name }}</td>  <!-- Changer genre en genre_name -->
-                <td>
-                    <a href="/genres/{{ g._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
-                    <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ g._id }}')">Supprimer</a>
-                    
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Bibliothèque</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="/abonnes">Abonnés</a></li>
+                <li class="nav-item"><a class="nav-link" href="/documents">Documents</a></li>
+                <li class="nav-item"><a class="nav-link" href="/emprunts">Emprunts</a></li>
+                <li class="nav-item"><a class="nav-link" href="/genres">Genre</a></li>
+                <li class="nav-item"><a class="nav-link" href="/dashboard">Tableau de Bord</a></li>
+                <li class="nav-item">
+                    <form action="/logout" method="POST" style="display: inline;">
+                        <button class="btn btn-danger btn-sm nav-link text-white" style="border: none;">Déconnexion</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-    <a href="/add_genre" class="btn btn-primary mt-3">Ajouter un genre</a>
-    <a href="/" class="btn btn-primary mt-3">Retour</a>
-</div>
+    <!-- Contenu principal -->
+    <div class="container mt-4">
+        <h1>Liste des Genres</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Genre</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in genres %}
+                <tr>
+                    <td>{{ g.genre_name }}</td> <!-- Changer genre en genre_name -->
+                    <td>
+                        <a href="/genres/{{ g._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
+                        <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ g._id }}')">Supprimer</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-<!-- Ajout d'un script JavaScript pour la confirmation -->
-<script>
-    function confirmDelete(id) {
-        // Demander à l'utilisateur de confirmer la suppression
-        var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer ce genre?");
-        if (confirmAction) {
-            // Si l'utilisateur confirme, rediriger vers la route de suppression
-            window.location.href = '/genres/' + id + '/delete';
+        <a href="/add_genre" class="btn btn-primary mt-3">Ajouter un genre</a>
+        <a href="/" class="btn btn-primary mt-3">Retour</a>
+    </div>
+
+    <!-- Script de confirmation pour la suppression -->
+    <script>
+        function confirmDelete(id) {
+            var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer ce genre?");
+            if (confirmAction) {
+                window.location.href = '/genres/' + id + '/delete';
+            }
         }
-    }
-</script>
+    </script>
+
+    <!-- Scripts JS de Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
 </html>
