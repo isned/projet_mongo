@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des Genres</title>
     <!-- Inclure Bootstrap ou autres styles si nécessaire -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
@@ -24,7 +26,9 @@
                 <li class="nav-item"><a class="nav-link" href="/dashboard">Tableau de Bord</a></li>
                 <li class="nav-item">
                     <form action="/logout" method="POST" style="display: inline;">
-                        <button class="btn btn-danger btn-sm nav-link text-white" style="border: none;">Déconnexion</button>
+                        <button class="btn btn-danger btn-sm nav-link text-white" style="border: none;">
+                            <i class="fas fa-sign-out-alt"></i> <!-- Icône pour déconnexion -->
+                        </button>
                     </form>
                 </li>
             </ul>
