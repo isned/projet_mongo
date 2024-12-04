@@ -27,7 +27,7 @@ mongo = PyMongo(app)
 CORS(app) 
 
 
-@app.route('/')
+@app.route('/index')
 def home():
     emprunts = emprunt.get_emprunts(mongo)
 
@@ -42,7 +42,7 @@ def logout():
     session.clear()
     flash('Vous avez été déconnecté.', 'info')
     return redirect(url_for('login'))
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         data = request.form
