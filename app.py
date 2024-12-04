@@ -89,7 +89,6 @@ def register():
     return render_template('users/register.html')
 
 
-
 # Route pour lister les abonnés
 @app.route('/abonnes', methods=['GET'])
 def abonnes_lister():
@@ -537,7 +536,8 @@ def dashboard():
     # Calcul de la disponibilité des documents
     documents_disponibles = mongo.db.documents.count_documents({'disponibilite': 'Disponible'})
     documents_non_disponibles = mongo.db.documents.count_documents({'disponibilite': 'Indisponible'})
-
+   
+     
     # Passer les données au template
     return render_template('dashboard.html', 
                            emprunts=emprunts,
@@ -546,7 +546,11 @@ def dashboard():
                            total_documents=total_documents,
                            total_genres=total_genres,
                            documents_disponibles=documents_disponibles,
-                           documents_non_disponibles=documents_non_disponibles)
+                           documents_non_disponibles=documents_non_disponibles,
+                          )
+
+
+
 
 
 
