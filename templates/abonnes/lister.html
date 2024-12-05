@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des Abonnés</title>
-    <!-- Inclure Bootstrap ou autres styles si nécessaire -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <a class="navbar-brand" href="/index">Bibliothèque</a>
@@ -27,7 +26,7 @@
                 <li class="nav-item">
                     <form action="/logout" method="POST" style="display: inline;">
                         <button class="btn btn-danger btn-sm nav-link text-white" style="border: none;">
-                            <i class="fas fa-sign-out-alt"></i> <!-- Icône pour déconnexion -->
+                            <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </form>
                 </li>
@@ -36,47 +35,78 @@
     </nav>
 
     <!-- Contenu principal -->
-    <div class="container mt-4">
-        <h1>Liste des Abonnés</h1>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Prénom</th>
-                    <th>Adresse</th>
-                    <th>Date d'inscription</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ab in abonnes %}
-                <tr>
-                    <td>{{ ab.nom }}</td>
-                    <td>{{ ab.prenom }}</td>
-                    <td>{{ ab.adresse }}</td>
-                    <td>{{ ab.date_inscription }}</td>
-                    <td>
-                        <a href="/abonnes/{{ ab._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
-                        <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ ab._id }}')">Supprimer</a>
-                        <a href="/abonnes/{{ ab._id }}/" class="btn btn-info btn-sm">Détails</a>
-                        <a href="/abonnes/{{ ab._id }}/historique" class="btn btn-secondary btn-sm">Historique</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <main class="container mt-5">
+        <h1 class="text-center mb-4">Liste des Abonnés</h1>
+        
+        <!-- Barre de recherche -->
+        <div class="row mb-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Rechercher par nom ou prénom..." id="searchInput" onkeyup="searchByName()">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" onclick="searchByName()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <a href="/add_abonne" class="btn btn-primary mt-3">Ajouter un Abonné</a>
-        <a href="/" class="btn btn-primary mt-3">Retour</a>
-    </div>
+        <!-- Liste des abonnés -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Adresse</th>
+                        <th>Date d'inscription</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ab in abonnes %}
+                    <tr>
+                        <td>{{ ab.nom }}</td>
+                        <td>{{ ab.prenom }}</td>
+                        <td>{{ ab.adresse }}</td>
+                        <td>{{ ab.date_inscription }}</td>
+                        <td>
+                            <a href="/abonnes/{{ ab._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
+                            <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ ab._id }}')">Supprimer</a>
+                            <a href="/abonnes/{{ ab._id }}/" class="btn btn-info btn-sm">Détails</a>
+                            <a href="/abonnes/{{ ab._id }}/historique" class="btn btn-secondary btn-sm">Historique</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="/add_abonne" class="btn btn-primary mt-3">Ajouter un Abonné</a>
+        <a href="/index" class="btn btn-primary mt-3">Retour</a>
+        </div>
+    </main>
 
-    <!-- Ajout d'un script JavaScript pour la confirmation -->
+    <!-- Script JS pour la recherche -->
     <script>
+        function searchByName() {
+            var searchValue = document.getElementById("searchInput").value.toLowerCase();
+            var rows = document.querySelectorAll("table tbody tr");
+
+            rows.forEach(function(row) {
+                var nom = row.cells[0].textContent.toLowerCase();
+                var prenom = row.cells[1].textContent.toLowerCase();
+
+                if (nom.includes(searchValue) || prenom.includes(searchValue)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
         function confirmDelete(id) {
-            // Demander à l'utilisateur de confirmer la suppression
             var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer cet abonné ?");
             if (confirmAction) {
-                // Si l'utilisateur confirme, rediriger vers la route de suppression
                 window.location.href = '/abonnes/' + id + '/delete';
             }
         }

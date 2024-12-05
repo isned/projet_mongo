@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des Documents</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
-    <!-- Inclure Bootstrap ou autres styles si nécessaire -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Navbar -->
@@ -26,7 +25,7 @@
                 <li class="nav-item">
                     <form action="/logout" method="POST" style="display: inline;">
                         <button class="btn btn-danger btn-sm nav-link text-white" style="border: none;">
-                            <i class="fas fa-sign-out-alt"></i> <!-- Icône pour déconnexion -->
+                            <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </form>
                 </li>
@@ -34,52 +33,88 @@
         </div>
     </nav>
 
-    <!-- Contenu Principal -->
-    <div class="container mt-4">
-        <h1>Liste des Documents</h1>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Titre</th>
-                    <th>Auteur</th>
-                    <th>Genre</th>
-                    <th>Date de Publication</th>
-                    <th>Disponibilité</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for doc in documents %}
-                <tr>
-                    <td>{{ doc.titre }}</td>
-                    <td>{{ doc.auteur }}</td>
-                    <td>{{ doc.genre }}</td>
-                    <td>{{ doc.date_publication }}</td>
-                    <td>{{ doc.disponibilite }}</td>
-                    <td>
-                        <a href="/documents/{{ doc._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
-                        <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ doc._id }}')">Supprimer</a>
-                        <a href="/documents/{{ doc._id }}/" class="btn btn-info btn-sm">Détails</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Contenu principal -->
+    <main class="container mt-5">
+        <h1 class="text-center mb-4">Liste des Documents</h1>
+        
+        <!-- Barre de recherche -->
+        <div class="row mb-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Rechercher un document par titre..." id="searchInput" onkeyup="filterDocuments()">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" onclick="filterDocuments()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Liste des documents -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Titre</th>
+                        <th>Auteur</th>
+                        <th>Genre</th>
+                        <th>Date de Publication</th>
+                        <th>Disponibilité</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="documentsTable">
+                    {% for doc in documents %}
+                    <tr>
+                        <td>{{ doc.titre }}</td>
+                        <td>{{ doc.auteur }}</td>
+                        <td>{{ doc.genre }}</td>
+                        <td>{{ doc.date_publication }}</td>
+                        <td>{{ doc.disponibilite }}</td>
+                        <td>
+                            <a href="/documents/{{ doc._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
+                            <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ doc._id }}')">Supprimer</a>
+                            <a href="/documents/{{ doc._id }}/" class="btn btn-info btn-sm">Détails</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Boutons d'action -->
         <a href="/add_document" class="btn btn-primary mt-3">Ajouter un Document</a>
-        <a href="/" class="btn btn-primary mt-3">Retour</a>
-    </div>
+        <a href="/index" class="btn btn-secondary mt-3">Retour</a>
+    </main>
 
-    <!-- Ajout d'un script JavaScript pour la confirmation -->
+    <!-- Script JS pour la recherche -->
     <script>
+        function filterDocuments() {
+            const searchValue = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#documentsTable tr");
+
+            rows.forEach(row => {
+                const title = row.cells[0].textContent.toLowerCase(); // La cellule du titre est la première
+                if (title.includes(searchValue)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
         function confirmDelete(id) {
-            // Demander à l'utilisateur de confirmer la suppression
-            var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer ce document ?");
+            const confirmAction = confirm("Êtes-vous sûr de vouloir supprimer ce document ?");
             if (confirmAction) {
-                // Si l'utilisateur confirme, rediriger vers la route de suppression
                 window.location.href = '/documents/' + id + '/delete';
             }
         }
     </script>
+
+    <!-- Scripts Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
