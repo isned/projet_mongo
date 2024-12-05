@@ -27,7 +27,7 @@ mongo = PyMongo(app)
 CORS(app) 
 
 
-@app.route('/index')
+"""@app.route('/index')
 def home():
     emprunts = emprunt.get_emprunts(mongo)
 
@@ -35,7 +35,7 @@ def home():
     documents = {str(document['_id']): document for document in mongo.db.documents.find()}
     genres = {str(genre['_id']): genre for genre in mongo.db.genres.find()}
 
-    return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents, genres=genres)
+    return render_template('index.html', emprunts=emprunts, abonnes=abonnes, documents=documents, genres=genres)"""
 
 @app.route('/logout', methods=['POST'])
 def logout():

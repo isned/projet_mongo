@@ -37,9 +37,9 @@
     <main class="container mt-5">
         <h1 class="text-center mb-4">Liste des Emprunts</h1>
         
-        <!-- Barre de recherche et filtre par statut -->
+        <!-- Barre de recherche -->
         <div class="row mb-4">
-            <div class="col-md-6 offset-md-3">
+            <div class="col-md-4">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Rechercher un emprunt par titre..." id="searchInput" onkeyup="filterDocuments()">
                     <div class="input-group-append">
@@ -48,13 +48,6 @@
                         </button>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <select class="form-control" id="statusFilter" onchange="filterDocuments()">
-                    <option value="">Filtrer par statut</option>
-                    <option value="retourné">Retourné</option>
-                    <option value="emprunté">Emprunté</option>
-                </select>
             </div>
         </div>
 
@@ -67,7 +60,14 @@
                         <th>Titre du Document</th>
                         <th>Date Emprunt</th>
                         <th>Date Retour Prévu</th>
-                        <th>Statut</th>
+                        <th>Statut
+                            <!-- Filtrage par statut -->
+                            <select class="form-control d-inline w-auto" id="statusFilter" onchange="filterDocuments()" style="margin-left: 10px;">
+                                <option value="">Filtrer par statut</option>
+                                <option value="retourné">Retourné</option>
+                                <option value="emprunté">Emprunté</option>
+                            </select>
+                        </th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -107,7 +107,7 @@
                 const documentTitle = row.cells[1].textContent.toLowerCase();  // Document Title
                 const borrowDate = row.cells[2].textContent.toLowerCase();  // Borrow Date
                 const expectedReturnDate = row.cells[3].textContent.toLowerCase();  // Expected Return Date
-                const status = row.cells[4].textContent.toLowerCase();  // Status
+                const status = row.cells[4].textContent.toLowerCase();  // Status                                   <th>Statut</th>
     
                 const matchesSearch = abonneName.includes(searchValue) || documentTitle.includes(searchValue) || borrowDate.includes(searchValue) || expectedReturnDate.includes(searchValue);
                 const matchesStatus = status.includes(statusValue);
@@ -120,7 +120,6 @@
                 }
             });
         }
-    
         function confirmDelete(id) {
             const confirmAction = confirm("Êtes-vous sûr de vouloir supprimer cet emprunt ?");
             if (confirmAction) {
