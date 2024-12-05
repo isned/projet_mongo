@@ -3,12 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Principale - Liste des Emprunts</title>
-    <link rel="stylesheet" href="/static/css/style.css"> <!-- Lien vers un fichier CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet"> <!-- Google Font -->
+    <title>Tableau de Bord</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Taille des graphiques */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px; /* Hauteur des graphiques ajustée */
+            margin-bottom: 20px;
+        }
+        
+        /* Design des cartes d'information */
+        .card-body h3 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
 
+        .card-header {
+            font-size: 1.2rem;
+            background-color: #3b434d;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Espacement entre les cartes */
+        .card {
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Espacement et centrage du contenu principal */
+        .container {
+            margin-top: 20px;
+        }
+
+        /* Amélioration des boutons */
+        .btn-danger {
+            border-radius: 5px;
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        /* Espacement des graphiques sur les petits écrans */
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px; /* Réduction de la hauteur des graphiques sur les petits écrans */
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -31,71 +83,48 @@
                         </button>
                     </form>
                 </li>
-                
             </ul>
         </div>
     </nav>
 
     <!-- Contenu principal -->
-    <main class="container mt-5">
-        <!-- Barre de recherche -->
-        <div class="row mb-4">
-            <div class="col-md-6 offset-md-3">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Rechercher un emprunt par titre..." id="searchInputTitre" onkeyup="searchByTitle()">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary" onclick="searchByTitle()"></button>
+    <div class="container">
+        <h2 class="text-center mb-4">Tableau de Bord</h2>
+        <div class="row">
+            <!-- Statistiques -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">Nombre d'Abonnés</div>
+                    <div class="card-body">
+                        <h3 class="text-center">{{ total_abonnes }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">Nombre de Documents</div>
+                    <div class="card-body">
+                        <h3 class="text-center">{{ total_documents }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">Nombre de Genres</div>
+                    <div class="card-body">
+                        <h3 class="text-center">{{ total_genres }}</h3>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Liste des emprunts -->
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Nom de l'Abonné</th>
-                        <th>Titre du Document</th>
-                        <th>Date Emprunt</th>
-                        <th>Date Retour Prévu</th>
-                        <th>Statut</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for em in emprunts %}
-                    <tr>
-                        <td>{{ em.abonne.nom }} {{ em.abonne.prenom }}</td>
-                        <td>{{ em.document.titre }}</td>
-                        <td>{{ em.date_emprunt }}</td>
-                        <td>{{ em.date_retour_prevu }}</td>
-                        <td>{{ em.statut }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </main>
+        <!-- Section de graphiques (facultative) -->
+        <!-- Vous pouvez ajouter des graphiques ici si nécessaire -->
 
-    <script>
-        function searchByTitle() {
-            var searchValue = document.getElementById("searchInputTitre").value.toLowerCase();
-            var rows = document.querySelectorAll("table tbody tr");
+    </div>
 
-            rows.forEach(function(row) {
-                var titleCell = row.cells[1]; // La cellule du titre est la deuxième
-                var title = titleCell.textContent.toLowerCase();
-                
-                if (title.includes(searchValue)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-        }
-    </script>
     <!-- Scripts JS de Bootstrap -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Version complète de jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>

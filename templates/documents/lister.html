@@ -11,7 +11,7 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <a class="navbar-brand" href="/index">Bibliothèque</a>
+        <a class="navbar-brand" href="#">Bibliothèque</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -41,7 +41,7 @@
         <div class="row mb-4">
             <div class="col-md-6 offset-md-3">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Rechercher un document par titre..." id="searchInput" onkeyup="filterDocuments()">
+                    <input type="text" class="form-control" placeholder="Rechercher un document..." id="searchInput" onkeyup="filterDocuments()">
                     <div class="input-group-append">
                         <button class="btn btn-primary" onclick="filterDocuments()">
                             <i class="fas fa-search"></i>
@@ -85,24 +85,39 @@
 
         <!-- Boutons d'action -->
         <a href="/add_document" class="btn btn-primary mt-3">Ajouter un Document</a>
-        <a href="/index" class="btn btn-secondary mt-3">Retour</a>
+        <a href="/dashboard" class="btn btn-secondary mt-3">Retour</a>
     </main>
 
     <!-- Script JS pour la recherche -->
     <script>
         function filterDocuments() {
-            const searchValue = document.getElementById("searchInput").value.toLowerCase();
-            const rows = document.querySelectorAll("#documentsTable tr");
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#documentsTable tr");
 
-            rows.forEach(row => {
-                const title = row.cells[0].textContent.toLowerCase(); // La cellule du titre est la première
-                if (title.includes(searchValue)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
+    rows.forEach(row => {
+        const title = row.cells[0].textContent.toLowerCase();  // Title column
+        const author = row.cells[1].textContent.toLowerCase();  // Author column
+        const genre = row.cells[2].textContent.toLowerCase();   // Genre column
+        const date = row.cells[3].textContent.toLowerCase();    // Publication Date column
+        const availability = row.cells[4].textContent.toLowerCase(); // Availability column
+
+        // Check if the search value is found in any of the columns
+        if (
+            title.includes(searchValue) ||
+            author.includes(searchValue) ||
+            genre.includes(searchValue) ||
+            date.includes(searchValue) ||
+            availability.includes(searchValue) ||
+            availability === 'disponible' && searchValue === 'disponible' || 
+            availability === 'indisponible' && searchValue === 'indisponible'
+        ) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
         }
+    });
+}
+
 
         function confirmDelete(id) {
             const confirmAction = confirm("Êtes-vous sûr de vouloir supprimer ce document ?");

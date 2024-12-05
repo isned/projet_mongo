@@ -62,7 +62,7 @@ def login():
 
         # Redirection après connexion réussie
         print(f"Connexion réussie pour l'utilisateur : {email}")
-        return redirect(url_for('home'))  # Redirige vers la page principale
+        return redirect(url_for('dashboard'))  # Redirige vers la page principale
 
     return render_template('users/login.html')
 

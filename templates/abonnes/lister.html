@@ -12,7 +12,7 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <a class="navbar-brand" href="/index">Bibliothèque</a>
+        <a class="navbar-brand" href="#">Bibliothèque</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -42,9 +42,9 @@
         <div class="row mb-4">
             <div class="col-md-6 offset-md-3">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Rechercher par nom ou prénom..." id="searchInput" onkeyup="searchByName()">
+                    <input type="text" class="form-control" placeholder="Rechercher..." id="searchInput" onkeyup="searchByAttributes()">
                     <div class="input-group-append">
-                        <button class="btn btn-primary" onclick="searchByName()">
+                        <button class="btn btn-primary" onclick="searchByAttributes()">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
@@ -82,21 +82,30 @@
                 </tbody>
             </table>
             <a href="/add_abonne" class="btn btn-primary mt-3">Ajouter un Abonné</a>
-        <a href="/index" class="btn btn-primary mt-3">Retour</a>
+            <a href="/dashboard" class="btn btn-primary mt-3">Retour</a>
         </div>
     </main>
 
     <!-- Script JS pour la recherche -->
     <script>
-        function searchByName() {
+        function searchByAttributes() {
             var searchValue = document.getElementById("searchInput").value.toLowerCase();
             var rows = document.querySelectorAll("table tbody tr");
 
             rows.forEach(function(row) {
-                var nom = row.cells[0].textContent.toLowerCase();
-                var prenom = row.cells[1].textContent.toLowerCase();
+                var cells = row.cells;
+                var showRow = false;
 
-                if (nom.includes(searchValue) || prenom.includes(searchValue)) {
+                // Vérifier chaque cellule de la ligne
+                for (var i = 0; i < cells.length; i++) {
+                    var cellContent = cells[i].textContent.toLowerCase();
+                    if (cellContent.includes(searchValue)) {
+                        showRow = true;
+                        break;  // Si un match est trouvé, on affiche la ligne
+                    }
+                }
+
+                if (showRow) {
                     row.style.display = "";
                 } else {
                     row.style.display = "none";

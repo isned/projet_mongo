@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des Emprunts</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <a class="navbar-brand" href="/index">Bibliothèque</a>
+        <a class="navbar-brand" href="#">Bibliothèque</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -35,56 +34,102 @@
     </nav>
 
     <!-- Contenu principal -->
-    <div class="container mt-4">
-        <h1>Liste des Emprunts</h1>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Nom de l'Abonné</th>
-                    <th>Titre du Document</th>
-                    <th>Date Emprunt</th>
-                    <th>Date Retour Prévu</th>
-                    <th>Statut</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for em in emprunts %}
-                <tr>
-                    <td>{{ em.abonne.nom }} {{ em.abonne.prenom }}</td>
-                    <td>{{ em.document.titre }}</td>
-                    <td>{{ em.date_emprunt }}</td>
-                    <td>{{ em.date_retour_prevu }}</td>
-                    <td>{{ em.statut }}</td>
-                    <td>
-                        <a href="/emprunts/{{ em._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
-                        <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ em._id }}')">Supprimer</a>
-                        <a href="/emprunts/{{ em._id }}/" class="btn btn-info btn-sm">Détails</a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="6">Aucun emprunt trouvé.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <main class="container mt-5">
+        <h1 class="text-center mb-4">Liste des Emprunts</h1>
+        
+        <!-- Barre de recherche et filtre par statut -->
+        <div class="row mb-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Rechercher un emprunt par titre..." id="searchInput" onkeyup="filterDocuments()">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" onclick="filterDocuments()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" id="statusFilter" onchange="filterDocuments()">
+                    <option value="">Filtrer par statut</option>
+                    <option value="retourné">Retourné</option>
+                    <option value="emprunté">Emprunté</option>
+                </select>
+            </div>
+        </div>
 
-        <a href="/add_emprunt" class="btn btn-primary mt-3">Ajouter un emprunt</a>
-        <a href="/" class="btn btn-primary mt-3">Retour</a>
-    </div>
+        <!-- Liste des emprunts -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Nom de l'Abonné</th>
+                        <th>Titre du Document</th>
+                        <th>Date Emprunt</th>
+                        <th>Date Retour Prévu</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="documentsTable">
+                    {% for em in emprunts %}
+                    <tr>
+                        <td>{{ em.abonne.nom }} {{ em.abonne.prenom }}</td>
+                        <td>{{ em.document.titre }}</td>
+                        <td>{{ em.date_emprunt }}</td>
+                        <td>{{ em.date_retour_prevu }}</td>
+                        <td>{{ em.statut }}</td>
+                        <td>
+                            <a href="/emprunts/{{ em._id }}/update" class="btn btn-warning btn-sm">Modifier</a>
+                            <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ em._id }}')">Supprimer</a>
+                            <a href="/emprunts/{{ em._id }}/" class="btn btn-info btn-sm">Détails</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <!-- Script de confirmation pour la suppression -->
+        <!-- Boutons d'action -->
+        <a href="/add_emprunt" class="btn btn-primary mt-3">Ajouter un Emprunt</a>
+        <a href="/dashboard" class="btn btn-secondary mt-3">Retour</a>
+    </main>
+
+    <!-- Script JS pour la recherche et filtrage -->
     <script>
+        function filterDocuments() {
+            const searchValue = document.getElementById("searchInput").value.toLowerCase();
+            const statusValue = document.getElementById("statusFilter").value.toLowerCase();
+            const rows = document.querySelectorAll("#documentsTable tr");
+    
+            rows.forEach(row => {
+                const abonneName = row.cells[0].textContent.toLowerCase();  // Subscriber Name
+                const documentTitle = row.cells[1].textContent.toLowerCase();  // Document Title
+                const borrowDate = row.cells[2].textContent.toLowerCase();  // Borrow Date
+                const expectedReturnDate = row.cells[3].textContent.toLowerCase();  // Expected Return Date
+                const status = row.cells[4].textContent.toLowerCase();  // Status
+    
+                const matchesSearch = abonneName.includes(searchValue) || documentTitle.includes(searchValue) || borrowDate.includes(searchValue) || expectedReturnDate.includes(searchValue);
+                const matchesStatus = status.includes(statusValue);
+    
+                // Check if the search value matches any of the columns and if the status matches the selected status
+                if (matchesSearch && (statusValue === "" || matchesStatus)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+    
         function confirmDelete(id) {
-            var confirmAction = confirm("Êtes-vous sûr de vouloir supprimer cet emprunt ?");
+            const confirmAction = confirm("Êtes-vous sûr de vouloir supprimer cet emprunt ?");
             if (confirmAction) {
                 window.location.href = '/emprunts/' + id + '/delete';
             }
         }
     </script>
-
-    <!-- Scripts JS de Bootstrap -->
+    
+    <!-- Scripts Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
