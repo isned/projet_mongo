@@ -10,7 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar -->
+   
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <a class="navbar-brand" href="#">Bibliothèque</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,11 +34,11 @@
         </div>
     </nav>
 
-    <!-- Contenu principal -->
+    
     <main class="container mt-5">
         <h1 class="text-center mb-4">Liste des Abonnés</h1>
         
-        <!-- Barre de recherche -->
+        <
         <div class="row mb-4">
             <div class="col-md-6 offset-md-3">
                 <div class="input-group">
@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        <!-- Liste des abonnés -->
+  
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead class="thead-dark">
@@ -86,7 +86,7 @@
         </div>
     </main>
 
-    <!-- Script JS pour la recherche -->
+ 
     <script>
         function searchByAttributes() {
             var searchValue = document.getElementById("searchInput").value.toLowerCase();
@@ -96,12 +96,12 @@
                 var cells = row.cells;
                 var showRow = false;
 
-                // Vérifier chaque cellule de la ligne
+               
                 for (var i = 0; i < cells.length; i++) {
                     var cellContent = cells[i].textContent.toLowerCase();
                     if (cellContent.includes(searchValue)) {
                         showRow = true;
-                        break;  // Si un match est trouvé, on affiche la ligne
+                        break;  
                     }
                 }
 
@@ -121,7 +121,7 @@
         }
     </script>
 
-    <!-- Scripts JS de Bootstrap -->
+ 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

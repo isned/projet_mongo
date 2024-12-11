@@ -44,16 +44,7 @@
     <!-- Formulaire pour ajouter un emprunt -->
     <form id="empruntForm">
         <!-- Sélectionner un abonné -->
-        <div class="mb-3">
-            <label for="abonne_id" class="form-label">Abonné :</label>
-            <select class="form-select" id="abonne_id" name="abonne_id" required>
-                {% for abonne in abonnes %}
-                    <option value="{{ abonne._id }}">{{ abonne.nom }} {{ abonne.prenom }}</option>
-                {% else %}
-                    <option disabled>Aucun abonné trouvé</option>
-                {% endfor %}
-            </select>
-        </div>
+        
 
         <!-- Sélectionner un document -->
         <div class="mb-3">
@@ -63,6 +54,16 @@
                     <option value="{{ document._id }}">{{ document.titre }}</option>
                 {% else %}
                     <option disabled>Aucun document trouvé</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="abonne_id" class="form-label">Abonné :</label>
+            <select class="form-select" id="abonne_id" name="abonne_id" required>
+                {% for abonne in abonnes %}
+                    <option value="{{ abonne._id }}">{{ abonne.nom }} {{ abonne.prenom }}</option>
+                {% else %}
+                    <option disabled>Aucun abonné trouvé</option>
                 {% endfor %}
             </select>
         </div>

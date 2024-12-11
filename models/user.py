@@ -2,14 +2,14 @@ class User:
     def __init__(self, email, password=None):
         self.email = email
         if password:
-            self.password = password  # Store the password directly without hashing
+            self.password = password  
         else:
             self.password = None
 
     def check_password(self, password):
         """Check if the entered password matches the stored plain password."""
         if self.password:
-            return self.password == password  # Direct comparison with stored password
+            return self.password == password  
         return False
 
     @staticmethod
@@ -24,5 +24,5 @@ class User:
         """Enregistre l'utilisateur dans la base de données."""
         users_collection.insert_one({
             "email": self.email,
-            "password": self.password  # Store the plain password
+            "password": self.password  
         })

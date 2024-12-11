@@ -10,7 +10,7 @@ def add_genre(data, mongo):
 
 def update_genre(id, data, mongo):
     updated_genre = {
-        "genre_name": data['genre_name'],  # Vérifiez si cette clé existe
+        "genre_name": data['genre_name'], 
     }
     mongo.db.genres.update_one({"_id": ObjectId(id)}, {"$set": updated_genre})
     return {"message": "Genre mis à jour avec succès!"}

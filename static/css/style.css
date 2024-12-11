@@ -1,16 +1,16 @@
-/* Style personnalisé pour la page */
+
 body {
     font-family: 'Roboto', sans-serif;
     background-color: #f8f9fa;
 }
 
 nav {
-    background-color: #343a40;  /* Noir/gris très foncé */
+    background-color: #343a40;  
     padding: 10px 20px;
 }
 
 nav a {
-    color: #6a11cb;  /* Liens en blanc */
+    color: #6a11cb;  
     font-size: 16px;
     font-weight: 600;
 }
