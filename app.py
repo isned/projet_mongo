@@ -671,8 +671,11 @@ def dashboard():
 
 
 
-
+'''http://localhost:5000/apidocs/''' 
 
 if __name__== '__main__':
     print("Démarrage de l'application Flask sur le port 5000")
     app.run(debug=True, port=5000)
+
+
+  
