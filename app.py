@@ -16,9 +16,16 @@ from flask import request, redirect, render_template, jsonify
 
 from models.user import User
 
+
+
+from flasgger import Swagger
+from flask import Flask, request, redirect
+
+
+
 app = Flask(__name__)  
 app.config.from_object(Config)
-
+swagger = Swagger(app)  
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'  
 app.config['SESSION_COOKIE_SECURE'] = False  
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -79,11 +86,33 @@ def register():
 
 @app.route('/abonnes', methods=['GET'])
 def abonnes_lister():
-    abonnes = abonne.get_abonnes(mongo)  
+    """
+    Liste des abonnés
+    ---
+    responses:
+      200:
+        description: Liste des abonnés
+    """
+    abonnes = abonne.get_abonnes(mongo)
     return render_template('abonnes/lister.html', abonnes=abonnes)
 
 @app.route('/abonnes/<id>/', methods=['GET'])
 def show_abonne_details(id):
+    """
+    Afficher les détails d'un abonné
+    ---
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        description: L'ID de l'abonné
+    responses:
+      200:
+        description: Détails de l'abonné
+      404:
+        description: Abonné non trouvé
+    """
     ab = abonne.get_abonne_by_id(id, mongo)
     if ab:
         return render_template('abonnes/details.html', abonne=ab)
@@ -92,6 +121,21 @@ def show_abonne_details(id):
 
 @app.route('/abonnes/<id>/update', methods=['GET'])
 def show_update_abonne_form(id):
+    """
+    Afficher le formulaire de mise à jour d'un abonné
+    ---
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        description: L'ID de l'abonné
+    responses:
+      200:
+        description: Formulaire de mise à jour
+      404:
+        description: Abonné non trouvé
+    """
     abonne_to_update = abonne.get_abonne_by_id(id, mongo)
     if abonne_to_update:
         return render_template('abonnes/modifier.html', abonne=abonne_to_update)
@@ -100,6 +144,37 @@ def show_update_abonne_form(id):
 
 @app.route('/abonnes/<id>/update', methods=['POST'])
 def update_abonne(id):
+    """
+    Mettre à jour un abonné
+    ---
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        description: L'ID de l'abonné
+      - name: data
+        in: formData
+        required: true
+        type: object
+        description: Les données à mettre à jour pour l'abonné
+        schema:
+          type: object
+          properties:
+            nom:
+              type: string
+            prenom:
+              type: string
+            adresse:
+              type: string
+            date_inscription:
+              type: string
+    responses:
+      200:
+        description: Abonné mis à jour
+      400:
+        description: Aucune donnée fournie
+    """
     data = request.form
     if not data:
         return "Aucune donnée fournie", 400
@@ -108,6 +183,21 @@ def update_abonne(id):
 
 @app.route('/abonnes/<id>/delete', methods=['GET'])
 def delete_abonne_route(id):
+    """
+    Supprimer un abonné
+    ---
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        description: L'ID de l'abonné à supprimer
+    responses:
+      200:
+        description: Abonné supprimé avec succès
+      404:
+        description: Erreur lors de la suppression
+    """
     result = abonne.delete_abonne(id, mongo)
     if 'message' in result:
         return redirect('/abonnes')
@@ -116,10 +206,45 @@ def delete_abonne_route(id):
 
 @app.route('/add_abonne', methods=['GET'])
 def show_add_abonne_form():
+    """
+    Afficher le formulaire d'ajout d'un abonné
+    ---
+    responses:
+      200:
+        description: Formulaire d'ajout d'un abonné
+    """
     return render_template('abonnes/ajouter.html')
 
 @app.route('/add_abonne', methods=['POST'])
 def add_abonne_route():
+    """
+    Ajouter un nouvel abonné
+    ---
+    parameters:
+      - name: nom
+        in: formData
+        required: true
+        type: string
+        description: Le nom de l'abonné
+      - name: prenom
+        in: formData
+        required: true
+        type: string
+        description: Le prénom de l'abonné
+      - name: adresse
+        in: formData
+        required: true
+        type: string
+        description: L'adresse de l'abonné
+      - name: date_inscription
+        in: formData
+        required: true
+        type: string
+        description: La date d'inscription de l'abonné
+    responses:
+      201:
+        description: Abonné ajouté avec succès
+    """
     nom = request.form['nom']
     prenom = request.form['prenom']
     adresse = request.form['adresse']
@@ -135,11 +260,23 @@ def add_abonne_route():
     result = abonne.add_abonne(data, mongo)
     return redirect('/abonnes')
 
-
-
 @app.route('/abonnes/<id>/historique')
 def afficher_historique(id):
-    
+    """
+    Afficher l'historique des emprunts d'un abonné
+    ---
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        description: L'ID de l'abonné
+    responses:
+      200:
+        description: Historique des emprunts de l'abonné
+      404:
+        description: Abonné non trouvé
+    """
     abonne = mongo.db.abonnes.find_one({"_id": ObjectId(id)})
     if not abonne:
         return "Abonné non trouvé", 404
@@ -147,15 +284,6 @@ def afficher_historique(id):
     historique = emprunt.get_historique_emprunts(id, mongo)
     
     return render_template('abonnes/historique.html', abonne=abonne, historique=historique)
-
-
-
-
-
-
-
-
-
 
 
 
@@ -172,7 +300,39 @@ def show_add_document_form():
 
 @app.route('/add_document', methods=['POST'])
 def add_document_route():
-   
+    """
+    Ajouter un document
+    ---
+    parameters:
+      - name: titre
+        in: formData
+        required: true
+        type: string
+        description: Le titre du document
+      - name: auteur
+        in: formData
+        required: true
+        type: string
+        description: L'auteur du document
+      - name: genre_id
+        in: formData
+        required: true
+        type: string
+        description: L'ID du genre du document
+      - name: date_publication
+        in: formData
+        required: true
+        type: string
+        description: La date de publication du document
+      - name: disponibilite
+        in: formData
+        required: true
+        type: string
+        description: La disponibilité du document
+    responses:
+      201:
+        description: Document ajouté avec succès
+    """
     titre = request.form['titre']
     auteur = request.form['auteur']
     genre_id = request.form['genre_id']  
@@ -187,11 +347,11 @@ def add_document_route():
         'disponibilite': disponibilite
     }
     
-   
+    # Ajout du document dans la base de données
     result = document.add_document(data, mongo)
     
+    # Rediriger vers la page de liste des documents après ajout
     return redirect('/documents')
-
 
 @app.route('/documents', methods=['GET'])
 def documents_lister():
